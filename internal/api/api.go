@@ -7,10 +7,8 @@ import (
 	"net/http"
 
 	"github.com/farhansaleh/layanan_aptika_be/config"
-	"github.com/farhansaleh/layanan_aptika_be/internal/users"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	"github.com/go-playground/validator/v10"
 )
 
 type APIServer struct {
@@ -28,7 +26,6 @@ func (s *APIServer) Run() error {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 
-	validator := validator.New()
 	db, err := config.NewDB()
 	if err != nil {
 		return err
@@ -39,14 +36,9 @@ func (s *APIServer) Run() error {
 		fmt.Fprintln(w, "Hello World")
 	})
 
-	apiRoute := chi.NewRouter()
-	
-	usersRepository := users.NewRepository()
-	usersServices := users.NewService(db, usersRepository, validator)
-	usersHandler := users.NewHandler(usersServices)
-
-	users.SetupRoutes(usersHandler, apiRoute)
-	r.Mount("/api/v1", apiRoute)
+	apiRoutes := chi.NewRouter()
+	SetupRoutes(apiRoutes, db)
+	r.Mount("/api/v1", apiRoutes)
 
 	log.Printf("Server running at port localhost%s", s.addr)
 	return http.ListenAndServe(s.addr, r)
