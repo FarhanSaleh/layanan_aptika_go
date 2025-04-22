@@ -16,6 +16,7 @@ type Repository interface {
 	Delete(ctx context.Context, tx *sql.Tx, id string) error
 	FindById(ctx context.Context, tx *sql.Tx, id string) (domain.User, error)
 	FindAll(ctx context.Context, tx *sql.Tx) ([]domain.User, error)
+	FindByEmail(ctx context.Context, tx *sql.Tx, email string) (domain.User, error)
 }
 
 type RepositoryImpl struct{}
@@ -77,4 +78,18 @@ func (r *RepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) (usersResult [
 	}
 
 	return	
+}
+
+func (r *RepositoryImpl) FindByEmail(ctx context.Context, tx *sql.Tx, email string) (userResult domain.User, err error) {
+	SQL := `SELECT id, nama, email, password FROM users WHERE email = ?`
+	err = tx.QueryRowContext(ctx, SQL, email).Scan(&userResult.Id, &userResult.Nama, &userResult.Email, &userResult.Password)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			err = fmt.Errorf("user tidak ditemukan")
+			return
+		}
+		log.Println("ERROR QUERY: ", err)
+		return
+	}
+	return
 }
