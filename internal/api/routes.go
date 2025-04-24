@@ -5,9 +5,10 @@ import (
 
 	"github.com/farhansaleh/layanan_aptika_be/internal/api/auth"
 	"github.com/farhansaleh/layanan_aptika_be/internal/api/instansi"
-	"github.com/farhansaleh/layanan_aptika_be/internal/middlewares"
+	"github.com/farhansaleh/layanan_aptika_be/internal/api/pengelola"
 	rolepengelola "github.com/farhansaleh/layanan_aptika_be/internal/api/role_pengelola"
 	"github.com/farhansaleh/layanan_aptika_be/internal/api/users"
+	"github.com/farhansaleh/layanan_aptika_be/internal/middlewares"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-playground/validator/v10"
 )
@@ -19,18 +20,21 @@ func SetupRoutes(r chi.Router, db *sql.DB) {
 	usersRepository := users.NewRepository()
 	instansiRepository := instansi.NewRepository()
 	rolePengelolaRepository := rolepengelola.NewRepository()
+	pengelolaRepository := pengelola.NewRepository()
 
 	// Service
 	usersServices := users.NewService(db, usersRepository, validator)
 	authService := auth.NewService(db, usersRepository, validator)
 	instansiService := instansi.NewService(db, instansiRepository, validator)
 	rolePengelolaService := rolepengelola.NewService(db, rolePengelolaRepository, validator)
+	pengelolaService := pengelola.NewService(db, pengelolaRepository, validator)
 	
 	// Handler
 	usersHandler := users.NewHandler(usersServices)
 	authHandler := auth.NewHandler(authService)
 	instansiHandler := instansi.NewHandler(instansiService)
 	rolePengelolaHandler := rolepengelola.NewHandler(rolePengelolaService)
+	pengelolaHandler := pengelola.NewHandler(pengelolaService)
 	
 	// Protected routes
 	r.Group(func(r chi.Router) {
@@ -40,6 +44,12 @@ func SetupRoutes(r chi.Router, db *sql.DB) {
 		r.Delete("/users/{id}", usersHandler.Delete)
 		r.Get("/users", usersHandler.FindAll)
 		r.Get("/users/{id}", usersHandler.FindById)
+		
+		r.Post("/pengelola", pengelolaHandler.Create)
+		r.Put("/pengelola/{id}", pengelolaHandler.Update)
+		r.Delete("/pengelola/{id}", pengelolaHandler.Delete)
+		r.Get("/pengelola", pengelolaHandler.FindAll)
+		r.Get("/pengelola/{id}", pengelolaHandler.FindById)
 
 		r.Post("/instansi", instansiHandler.Create)
 		r.Put("/instansi/{id}", instansiHandler.Update)
