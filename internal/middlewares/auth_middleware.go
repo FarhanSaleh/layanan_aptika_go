@@ -1,7 +1,6 @@
 package middlewares
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/farhansaleh/layanan_aptika_be/config"
@@ -29,8 +28,6 @@ func AuthMiddleware(next http.Handler) http.Handler {
 			return []byte(conf.JWTSecret), nil
         })
 		
-		log.Println(token.Valid)
-
         if err != nil || !token.Valid {
             helper.WriteResponseBody(w, http.StatusUnauthorized, domain.DefaultResponse{
 				Message: "Token tidak valid",

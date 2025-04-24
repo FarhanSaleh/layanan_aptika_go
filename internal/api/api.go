@@ -2,22 +2,24 @@ package api
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/farhansaleh/layanan_aptika_be/config"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/cors"
 )
 
 type APIServer struct {
 	addr string
+	config *config.Config
 }
 
-func NewAPIServer(addr string) *APIServer {
+func NewAPIServer(addr string, config *config.Config) *APIServer {
 	return &APIServer{
 		addr: addr,
+		config: config,
 	}
 }
 
@@ -25,16 +27,19 @@ func (s *APIServer) Run() error {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins: s.config.AllowedOrigins,
+		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		AllowCredentials: true,
+	}))
+	r.Use(middleware.Heartbeat("/ping"))
 
 	db, err := config.NewDB()
 	if err != nil {
 		return err
 	}
 	initStorage(db)
-
-	r.Get("/check", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, "Hello World")
-	})
 
 	apiRoutes := chi.NewRouter()
 	SetupRoutes(apiRoutes, db)

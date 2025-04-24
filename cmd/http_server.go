@@ -16,7 +16,7 @@ func init(){
 func main() {
 	config := config.InitEnvs()
 
-	server := api.NewAPIServer(config.Port)
+	server := api.NewAPIServer(config.Port, &config)
 	
 	err := server.Run()
 	if err != nil {
