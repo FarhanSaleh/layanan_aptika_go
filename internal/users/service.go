@@ -80,13 +80,19 @@ func (s *ServiceImpl) Update(ctx context.Context, request domain.UserMutationReq
 	}
 
 	err = helper.WithTransaction(s.DB, func(tx *sql.Tx) (err error) {
-		user := domain.User{
-			Id: id,
+		result, err := s.Repository.FindById(ctx, tx, id)
+		if err != nil {
+			log.Println("ERROR REPO:")
+			return
+		}
+		
+		result = domain.User{
+			Id: result.Id,
 			Nama: request.Nama,
 			Email: request.Email,
 		}
 	
-		err = s.Repository.Update(ctx, tx, &user)
+		err = s.Repository.Update(ctx, tx, &result)
 		if err != nil{
 			log.Println("Error repo: ", err)
 			return
@@ -94,8 +100,8 @@ func (s *ServiceImpl) Update(ctx context.Context, request domain.UserMutationReq
 	
 		userResponse = domain.UserResponse{
 			Id: id,
-			Nama: user.Nama,
-			Email: user.Email,
+			Nama: result.Nama,
+			Email: result.Email,
 		}
 		return
 	})
