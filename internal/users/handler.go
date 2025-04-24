@@ -143,7 +143,7 @@ func (h *HandlerImpl) FindById(w http.ResponseWriter, r *http.Request){
 		response := domain.DefaultResponse{
 			Message: err.Error(),
 		}
-		helper.WriteResponseBody(w, http.StatusBadRequest, response)
+		helper.WriteResponseBody(w, http.StatusNotFound, response)
 		return
 	}
 
