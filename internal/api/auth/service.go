@@ -5,8 +5,8 @@ import (
 	"database/sql"
 	"log"
 
+	"github.com/farhansaleh/layanan_aptika_be/internal/api/users"
 	"github.com/farhansaleh/layanan_aptika_be/internal/domain"
-	"github.com/farhansaleh/layanan_aptika_be/internal/users"
 	"github.com/farhansaleh/layanan_aptika_be/pkg/helper"
 	"github.com/go-playground/validator/v10"
 	"golang.org/x/crypto/bcrypt"

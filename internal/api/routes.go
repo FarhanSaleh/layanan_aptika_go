@@ -3,11 +3,11 @@ package api
 import (
 	"database/sql"
 
-	"github.com/farhansaleh/layanan_aptika_be/internal/auth"
-	"github.com/farhansaleh/layanan_aptika_be/internal/instansi"
+	"github.com/farhansaleh/layanan_aptika_be/internal/api/auth"
+	"github.com/farhansaleh/layanan_aptika_be/internal/api/instansi"
 	"github.com/farhansaleh/layanan_aptika_be/internal/middlewares"
-	rolepengelola "github.com/farhansaleh/layanan_aptika_be/internal/role_pengelola"
-	"github.com/farhansaleh/layanan_aptika_be/internal/users"
+	rolepengelola "github.com/farhansaleh/layanan_aptika_be/internal/api/role_pengelola"
+	"github.com/farhansaleh/layanan_aptika_be/internal/api/users"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-playground/validator/v10"
 )
