@@ -33,43 +33,29 @@ func NewService(db *sql.DB, userRepository users.Repository, validate *validator
 }
 
 func (s *ServiceImpl) Login(ctx context.Context, request domain.LoginRequest) (loginResponse domain.LoginResponse, err error) {
-	tx, err := s.DB.Begin()
-	if err != nil {
-		log.Println("Error tx: ", err)
-		return
-	}
-	defer func(){
-		log.Println("DEFER ERR: ", err)
+	err = helper.WithTransaction(s.DB, func(tx *sql.Tx) (err error) {
+		user, err := s.UserRepository.FindByEmail(ctx, tx, request.Email)
 		if err != nil {
-			if errRoleback := tx.Rollback(); errRoleback != nil{
-				log.Println("ERROR ROLLBACK: ", err)
-				return
-			}
-		}	
-		if err := tx.Commit(); err != nil {
+			log.Println("Error repo: ", err)
 			return
 		}
-	}()
-
-	user, err := s.UserRepository.FindByEmail(ctx, tx, request.Email)
-	if err != nil {
-		log.Println("Error repo: ", err)
-		return
-	}
+		
+		err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(request.Password))
+		if err != nil {
+			log.Println("Error compare password: ", err)
+			return
+		}
 	
-	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(request.Password))
-	if err != nil {
-		log.Println("Error compare password: ", err)
+		
+		token, err := helper.GenerateJWT(user)
+		if err != nil {
+			log.Println("Error Generate Token: ", err)
+			return
+		}
+		loginResponse.AccessToken = token
 		return
-	}
-
+	})
 	
-	token, err := helper.GenerateJWT(user)
-	if err != nil {
-		log.Println("Error Generate Token: ", err)
-		return
-	}
-	loginResponse.AccessToken = token
 	return 
 }
 
