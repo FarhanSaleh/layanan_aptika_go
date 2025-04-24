@@ -42,10 +42,11 @@ func SetupRoutes(r chi.Router, db *sql.DB) {
 		r.Delete("/instansi/{id}", instansiHandler.Delete)
 		r.Get("/instansi", instansiHandler.FindAll)
 		r.Get("/instansi/{id}", instansiHandler.FindById)
+
+		r.Put("/change-password", authHandler.ChangePassword)
+		r.Delete("/logout", authHandler.Logout)
 	})
 
 	// Public routes
 	r.Post("/login", authHandler.Login)
-	r.Delete("/logout", authHandler.Logout)
-	r.Put("/change-password", authHandler.ChangePassword)
 }
