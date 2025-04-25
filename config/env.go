@@ -5,12 +5,13 @@ import (
 )
 
 type Config struct {
-	DatabaseDSN 	string
-	Port        	string
-	JWTPublicKey 	string
-	JWTPrivateKey	string
-	JWTSecret 		string
-	AllowedOrigins 	[]string
+	DatabaseDSN 			string
+	Port        			string
+	JWTPublicKey 			string
+	JWTPrivateKey			string
+	JWTSecret 				string
+	JWTPengelolaSecret 		string
+	AllowedOrigins 			[]string
 }
 
 func InitEnvs() Config {
@@ -20,6 +21,7 @@ func InitEnvs() Config {
 		JWTPublicKey: os.Getenv("JWT_PUBLIC_KEY"),
 		JWTPrivateKey: os.Getenv("JWT_PRIVATE_KEY"),
 		JWTSecret: os.Getenv("JWT_SECRET"),
+		JWTPengelolaSecret: os.Getenv("JWT_PENGELOLA_SECRET"),
 		AllowedOrigins: []string{os.Getenv("DEV_ORIGIN"), os.Getenv("PROD_ORIGIN")},
 	}
 }

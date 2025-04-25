@@ -24,7 +24,7 @@ func SetupRoutes(r chi.Router, db *sql.DB) {
 
 	// Service
 	usersServices := users.NewService(db, usersRepository, validator)
-	authService := auth.NewService(db, usersRepository, validator)
+	authService := auth.NewService(db, usersRepository, pengelolaRepository, validator)
 	instansiService := instansi.NewService(db, instansiRepository, validator)
 	rolePengelolaService := rolepengelola.NewService(db, rolePengelolaRepository, validator)
 	pengelolaService := pengelola.NewService(db, pengelolaRepository, validator)
@@ -36,21 +36,30 @@ func SetupRoutes(r chi.Router, db *sql.DB) {
 	rolePengelolaHandler := rolepengelola.NewHandler(rolePengelolaService)
 	pengelolaHandler := pengelola.NewHandler(pengelolaService)
 	
-	// Protected routes
+	// Protected routes user
 	r.Group(func(r chi.Router) {
-		r.Use(middlewares.AuthMiddleware)
-		r.Post("/users", usersHandler.Create)
-		r.Put("/users/{id}", usersHandler.Update)
-		r.Delete("/users/{id}", usersHandler.Delete)
-		r.Get("/users", usersHandler.FindAll)
-		r.Get("/users/{id}", usersHandler.FindById)
-		
+		r.Use(middlewares.UserAuthMiddleware)
+
+		r.Put("/change-password", authHandler.ChangePassword)
+		r.Delete("/logout", authHandler.Logout)
+	})
+
+	// Protected routes pengelola
+	r.Group(func(r chi.Router) {
+		r.Use(middlewares.PengelolaAuthMiddleware)
+
 		r.Post("/pengelola", pengelolaHandler.Create)
 		r.Put("/pengelola/{id}", pengelolaHandler.Update)
 		r.Delete("/pengelola/{id}", pengelolaHandler.Delete)
 		r.Get("/pengelola", pengelolaHandler.FindAll)
 		r.Get("/pengelola/{id}", pengelolaHandler.FindById)
 
+		r.Post("/users", usersHandler.Create)
+		r.Put("/users/{id}", usersHandler.Update)
+		r.Delete("/users/{id}", usersHandler.Delete)
+		r.Get("/users", usersHandler.FindAll)
+		r.Get("/users/{id}", usersHandler.FindById)
+		
 		r.Post("/instansi", instansiHandler.Create)
 		r.Put("/instansi/{id}", instansiHandler.Update)
 		r.Delete("/instansi/{id}", instansiHandler.Delete)
@@ -61,11 +70,9 @@ func SetupRoutes(r chi.Router, db *sql.DB) {
 		r.Get("/role-pengelola", rolePengelolaHandler.FindAll)
 		r.Put("/role-pengelola/{id}", rolePengelolaHandler.Update)
 		r.Delete("/role-pengelola/{id}", rolePengelolaHandler.Delete)
-
-		r.Put("/change-password", authHandler.ChangePassword)
-		r.Delete("/logout", authHandler.Logout)
 	})
 
 	// Public routes
 	r.Post("/login", authHandler.Login)
+	r.Post("/pengelola-login", authHandler.PengelolaLogin)
 }

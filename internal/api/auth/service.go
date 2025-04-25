@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"log"
 
+	"github.com/farhansaleh/layanan_aptika_be/internal/api/pengelola"
 	"github.com/farhansaleh/layanan_aptika_be/internal/api/users"
 	"github.com/farhansaleh/layanan_aptika_be/internal/domain"
 	"github.com/farhansaleh/layanan_aptika_be/pkg/helper"
@@ -14,19 +15,22 @@ import (
 
 type Service interface {
 	Login(ctx context.Context, request domain.LoginRequest) (domain.LoginResponse, error)
+	PengelolaLogin(ctx context.Context, request domain.LoginRequest) (domain.LoginResponse, error)
 	Logout(ctx context.Context) error
 	ChangePassword(ctx context.Context, request domain.ChangePasswordRequest) error
 }
 
 type ServiceImpl struct {
 	UserRepository users.Repository
+	PengelolaRepository pengelola.Repository
 	DB *sql.DB
 	Validate *validator.Validate
 }
 
-func NewService(db *sql.DB, userRepository users.Repository, validate *validator.Validate) Service {
+func NewService(db *sql.DB, userRepository users.Repository, pengelolaRepository pengelola.Repository, validate *validator.Validate) Service {
 	return &ServiceImpl{
 		UserRepository: userRepository,
+		PengelolaRepository: pengelolaRepository,
 		DB: db,
 		Validate: validate,
 	}
@@ -48,6 +52,33 @@ func (s *ServiceImpl) Login(ctx context.Context, request domain.LoginRequest) (l
 	
 		
 		token, err := helper.GenerateJWT(user)
+		if err != nil {
+			log.Println("Error Generate Token: ", err)
+			return
+		}
+		loginResponse.AccessToken = token
+		return
+	})
+	
+	return 
+}
+
+func (s *ServiceImpl) PengelolaLogin(ctx context.Context, request domain.LoginRequest) (loginResponse domain.LoginResponse, err error) {
+	err = helper.WithTransaction(s.DB, func(tx *sql.Tx) (err error) {
+		pengelola, err := s.PengelolaRepository.FindByEmail(ctx, tx, request.Email)
+		if err != nil {
+			log.Println("Error repo: ", err)
+			return
+		}
+		
+		err = bcrypt.CompareHashAndPassword([]byte(pengelola.Password), []byte(request.Password))
+		if err != nil {
+			log.Println("Error compare password: ", err)
+			return
+		}
+	
+		
+		token, err := helper.GeneratePengelolaJWT(pengelola)
 		if err != nil {
 			log.Println("Error Generate Token: ", err)
 			return

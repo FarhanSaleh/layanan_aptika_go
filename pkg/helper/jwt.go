@@ -30,3 +30,26 @@ func GenerateJWT(user domain.User) (tokenString string, err error) {
 	}
 	return
 }
+
+func GeneratePengelolaJWT(pengelola domain.Pengelola) (tokenString string, err error) {
+	conf := config.InitEnvs()
+
+	expTime := time.Now().Add(time.Hour)
+	claims := domain.JWTClaims{
+		Email: pengelola.Email,
+		Nama:  pengelola.Nama,
+		RoleId: pengelola.RoleId,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(expTime),
+		},
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenString, err = token.SignedString([]byte(conf.JWTPengelolaSecret))
+	
+	if err != nil {
+		log.Println("Error generate token: ", err)
+		return 
+	}
+	return
+}

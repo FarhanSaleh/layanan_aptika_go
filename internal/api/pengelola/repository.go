@@ -98,8 +98,8 @@ func (r *RepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) (result []doma
 }
 
 func (r *RepositoryImpl) FindByEmail(ctx context.Context, tx *sql.Tx, email string) (result domain.Pengelola, err error) {
-	SQL := `SELECT id, nama, email, password FROM pengelola WHERE email = ?`
-	err = tx.QueryRowContext(ctx, SQL, email).Scan(&result.Id, &result.Nama, &result.Email, &result.Password)
+	SQL := `SELECT id, nama, email, password, role_id FROM pengelola WHERE email = ?`
+	err = tx.QueryRowContext(ctx, SQL, email).Scan(&result.Id, &result.Nama, &result.Email, &result.Password, &result.RoleId)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			err = fmt.Errorf("pengelola tidak ditemukan")

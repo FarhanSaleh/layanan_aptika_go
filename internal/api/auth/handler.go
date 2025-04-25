@@ -10,6 +10,7 @@ import (
 
 type Handler interface {
 	Login(w http.ResponseWriter, r *http.Request)
+	PengelolaLogin(w http.ResponseWriter, r *http.Request)
 	Logout(w http.ResponseWriter, r *http.Request)
 	ChangePassword(w http.ResponseWriter, r *http.Request)
 }
@@ -29,6 +30,27 @@ func (h *HandlerImpl) Login(w http.ResponseWriter, r *http.Request){
 	helper.ParseBody(r, &request)
 
 	result, err := h.Service.Login(r.Context(), request)
+	if err != nil {
+		log.Println("Error Service: ", err)
+		response := domain.DefaultResponse{
+			Message: err.Error(),
+		}
+		helper.WriteResponseBody(w, http.StatusBadRequest, response)
+		return
+	}
+
+	response := domain.DefaultResponse{
+		Message: "Success Login",
+		Data: result,
+	}
+	helper.WriteResponseBody(w, http.StatusOK, response)
+}
+
+func (h *HandlerImpl) PengelolaLogin(w http.ResponseWriter, r *http.Request){
+	request := domain.LoginRequest{}
+	helper.ParseBody(r, &request)
+
+	result, err := h.Service.PengelolaLogin(r.Context(), request)
 	if err != nil {
 		log.Println("Error Service: ", err)
 		response := domain.DefaultResponse{
