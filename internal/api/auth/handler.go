@@ -32,10 +32,19 @@ func (h *HandlerImpl) Login(w http.ResponseWriter, r *http.Request){
 	result, err := h.Service.Login(r.Context(), request)
 	if err != nil {
 		log.Println("Error Service: ", err)
-		response := domain.DefaultResponse{
-			Message: err.Error(),
+
+		validationErr, ok := helper.IsValidationError(err)
+		if ok {
+			helper.WriteResponseBody(w, http.StatusBadRequest, domain.ErrorValidationResponse{
+				Message: validationErr.Error(),
+				Errors: validationErr.Errors,
+			})
+			return
 		}
-		helper.WriteResponseBody(w, http.StatusBadRequest, response)
+
+		helper.WriteResponseBody(w, http.StatusBadRequest, domain.DefaultResponse{
+			Message: err.Error(),
+		})
 		return
 	}
 
@@ -53,10 +62,19 @@ func (h *HandlerImpl) PengelolaLogin(w http.ResponseWriter, r *http.Request){
 	result, err := h.Service.PengelolaLogin(r.Context(), request)
 	if err != nil {
 		log.Println("Error Service: ", err)
-		response := domain.DefaultResponse{
-			Message: err.Error(),
+
+		validationErr, ok := helper.IsValidationError(err)
+		if ok {
+			helper.WriteResponseBody(w, http.StatusBadRequest, domain.ErrorValidationResponse{
+				Message: validationErr.Error(),
+				Errors: validationErr.Errors,
+			})
+			return
 		}
-		helper.WriteResponseBody(w, http.StatusBadRequest, response)
+
+		helper.WriteResponseBody(w, http.StatusBadRequest, domain.DefaultResponse{
+			Message: err.Error(),
+		})
 		return
 	}
 

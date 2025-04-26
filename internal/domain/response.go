@@ -7,7 +7,7 @@ type DefaultResponse struct {
 
 type ErrorValidationResponse struct {
 	Message string `json:"message"`
-	Errors  []ErrorsValidation
+	Errors  []ErrorsValidation `json:"errors"`
 }
 
 type ErrorsValidation struct {

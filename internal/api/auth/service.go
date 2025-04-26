@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"log"
 
 	"github.com/farhansaleh/layanan_aptika_be/internal/api/pengelola"
@@ -37,6 +38,13 @@ func NewService(db *sql.DB, userRepository users.Repository, pengelolaRepository
 }
 
 func (s *ServiceImpl) Login(ctx context.Context, request domain.LoginRequest) (loginResponse domain.LoginResponse, err error) {
+	err = s.Validate.Struct(request)
+	if err != nil {
+		log.Println("ERROR VALIDATE:", err)
+		err = helper.MappingValidationError(err)
+		return
+	}
+	
 	err = helper.WithTransaction(s.DB, func(tx *sql.Tx) (err error) {
 		user, err := s.UserRepository.FindByEmail(ctx, tx, request.Email)
 		if err != nil {
@@ -64,6 +72,13 @@ func (s *ServiceImpl) Login(ctx context.Context, request domain.LoginRequest) (l
 }
 
 func (s *ServiceImpl) PengelolaLogin(ctx context.Context, request domain.LoginRequest) (loginResponse domain.LoginResponse, err error) {
+	err = s.Validate.Struct(request)
+	if err != nil {
+		log.Println("ERROR VALIDATE:", err)
+		err = helper.MappingValidationError(err)
+		return
+	}
+
 	err = helper.WithTransaction(s.DB, func(tx *sql.Tx) (err error) {
 		pengelola, err := s.PengelolaRepository.FindByEmail(ctx, tx, request.Email)
 		if err != nil {
@@ -74,6 +89,7 @@ func (s *ServiceImpl) PengelolaLogin(ctx context.Context, request domain.LoginRe
 		err = bcrypt.CompareHashAndPassword([]byte(pengelola.Password), []byte(request.Password))
 		if err != nil {
 			log.Println("Error compare password: ", err)
+			err = fmt.Errorf("password atau email salah")
 			return
 		}
 	
