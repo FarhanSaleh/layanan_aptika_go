@@ -1,9 +1,11 @@
 package middlewares
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/farhansaleh/layanan_aptika_be/config"
+	contextkey "github.com/farhansaleh/layanan_aptika_be/internal/context_key"
 	"github.com/farhansaleh/layanan_aptika_be/internal/domain"
 	"github.com/farhansaleh/layanan_aptika_be/pkg/helper"
 	"github.com/golang-jwt/jwt/v5"
@@ -64,6 +66,10 @@ func PengelolaAuthMiddleware(next http.Handler) http.Handler {
 			})
             return
         }
+
+		tokenClaims := token.Claims.(*domain.JWTClaims)
+		ctx := context.WithValue(r.Context(), contextkey.PengelolaKey, tokenClaims.Email)
+		r = r.WithContext(ctx)
 
 		next.ServeHTTP(w, r)
 	})
