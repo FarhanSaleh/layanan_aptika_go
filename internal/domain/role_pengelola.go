@@ -19,5 +19,5 @@ type RolePengelolaResponse struct {
 }
 
 type RolePengelolaMutationRequest struct {
-	Nama string `json:"nama" validate:"required,alphanum"`
+	Nama string `json:"nama" validate:"required,ascii"`
 }

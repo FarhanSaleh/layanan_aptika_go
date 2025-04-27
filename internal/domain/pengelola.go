@@ -41,7 +41,7 @@ type PengelolaDetailResponse struct {
 }
 
 type PengelolaMutationRequest struct {
-	Nama   string `json:"nama" validate:"required,alpha,max=255,min=3"`
+	Nama   string `json:"nama" validate:"required,ascii,max=255,min=3"`
 	Email  string `json:"email" validate:"required,email"`
 	RoleId string `json:"role_id" validate:"required,uuid"`
 }
