@@ -3,8 +3,6 @@ package users
 import (
 	"context"
 	"database/sql"
-	"errors"
-	"fmt"
 	"log"
 
 	"github.com/farhansaleh/layanan_aptika_be/internal/domain"
@@ -43,21 +41,13 @@ func (r *RepositoryImpl) Delete(ctx context.Context, tx *sql.Tx, id string) (err
 	return
 }
 
-func (r *RepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, id string) (userResult domain.User, err error) {
+func (r *RepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, id string) (result domain.User, err error) {
 	SQL := `SELECT id, nama, email, created_at FROM users WHERE id = ?`
-	err = tx.QueryRowContext(ctx, SQL, id).Scan(&userResult.Id, &userResult.Nama, &userResult.Email, &userResult.CreatedAt)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			err = fmt.Errorf("user tidak ditemukan")
-			return
-		}
-		log.Println("ERROR QUERY: ", err)
-		return
-	}
+	err = tx.QueryRowContext(ctx, SQL, id).Scan(&result.Id, &result.Nama, &result.Email, &result.CreatedAt)
 	return 
 }
 
-func (r *RepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) (usersResult []domain.User, err error) {
+func (r *RepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) (result []domain.User, err error) {
 	SQL := `SELECT id, nama, email FROM users`
 
 	rows, err := tx.QueryContext(ctx, SQL)
@@ -74,22 +64,18 @@ func (r *RepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) (usersResult [
 			log.Println("ERROR SCANNING: ", err)
 			return 
 		}
-		usersResult = append(usersResult, u)
+		result = append(result, u)
 	}
-
+	if result == nil {
+		err = sql.ErrNoRows
+		return 
+	}
+	
 	return	
 }
 
-func (r *RepositoryImpl) FindByEmail(ctx context.Context, tx *sql.Tx, email string) (userResult domain.User, err error) {
+func (r *RepositoryImpl) FindByEmail(ctx context.Context, tx *sql.Tx, email string) (result domain.User, err error) {
 	SQL := `SELECT id, nama, email, password FROM users WHERE email = ?`
-	err = tx.QueryRowContext(ctx, SQL, email).Scan(&userResult.Id, &userResult.Nama, &userResult.Email, &userResult.Password)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			err = fmt.Errorf("user tidak ditemukan")
-			return
-		}
-		log.Println("ERROR QUERY: ", err)
-		return
-	}
+	err = tx.QueryRowContext(ctx, SQL, email).Scan(&result.Id, &result.Nama, &result.Email, &result.Password)
 	return
 }

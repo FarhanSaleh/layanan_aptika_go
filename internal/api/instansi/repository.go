@@ -3,8 +3,6 @@ package instansi
 import (
 	"context"
 	"database/sql"
-	"errors"
-	"fmt"
 	"log"
 
 	"github.com/farhansaleh/layanan_aptika_be/internal/domain"
@@ -42,21 +40,13 @@ func (r *RepositoryImpl) Delete(ctx context.Context, tx *sql.Tx, id string) (err
 	return
 }
 
-func (r *RepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, id string) (instansiResult domain.Instansi, err error) {
+func (r *RepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, id string) (result domain.Instansi, err error) {
 	SQL := `SELECT id, nama, alamat, keterangan FROM instansi WHERE id = ?`
-	err = tx.QueryRowContext(ctx, SQL, id).Scan(&instansiResult.Id, &instansiResult.Nama, &instansiResult.Alamat, &instansiResult.Keterangan)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			err = fmt.Errorf("instansi tidak ditemukan")
-			return
-		}
-		log.Println("ERROR QUERY: ", err)
-		return
-	}
+	err = tx.QueryRowContext(ctx, SQL, id).Scan(&result.Id, &result.Nama, &result.Alamat, &result.Keterangan)
 	return
 }
 
-func (r *RepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) (instansiResult []domain.Instansi, err error) {
+func (r *RepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) (result []domain.Instansi, err error) {
 	SQL := `SELECT id, nama, alamat, keterangan FROM instansi`
 	rows, err := tx.QueryContext(ctx, SQL)
 	if err != nil {
@@ -72,8 +62,12 @@ func (r *RepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) (instansiResul
 			log.Println("ERROR SCANNING: ", err)
 			return
 		}
-		instansiResult = append(instansiResult, i)
+		result = append(result, i)
 	}
+	if result == nil {
+		err = sql.ErrNoRows
+		return
+	} 
 	
 	return
 }

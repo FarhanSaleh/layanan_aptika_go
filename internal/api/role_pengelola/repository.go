@@ -3,8 +3,6 @@ package rolepengelola
 import (
 	"context"
 	"database/sql"
-	"errors"
-	"fmt"
 	"log"
 
 	"github.com/farhansaleh/layanan_aptika_be/internal/domain"
@@ -42,21 +40,13 @@ func (r *RepositoryImpl) Delete(ctx context.Context, tx *sql.Tx, id string) (err
 	return
 }
 
-func (r *RepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, id string) (rolePengelolaResult domain.RolePengelola, err error) {
+func (r *RepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, id string) (result domain.RolePengelola, err error) {
 	SQL := `SELECT id, nama FROM role_pengelola WHERE id = ?`
-	err = tx.QueryRowContext(ctx, SQL, id).Scan(&rolePengelolaResult.Id, &rolePengelolaResult.Nama)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			err = fmt.Errorf("role pengelola tidak ditemukan")
-			return
-		}
-		log.Println("ERROR QUERY: ", err)
-		return
-	}
+	err = tx.QueryRowContext(ctx, SQL, id).Scan(&result.Id, &result.Nama)
 	return
 }
 
-func (r *RepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) (rolePengelolaResult []domain.RolePengelola, err error) {
+func (r *RepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) (result []domain.RolePengelola, err error) {
 	SQL := `SELECT id, nama FROM role_pengelola`
 	rows, err := tx.QueryContext(ctx, SQL)
 	if err != nil {
@@ -72,8 +62,12 @@ func (r *RepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) (rolePengelola
 			log.Println("ERROR SCANNING: ", err)
 			return
 		}
-		rolePengelolaResult = append(rolePengelolaResult, rp)
+		result = append(result, rp)
 	}
-	
+	if result == nil {
+		err = sql.ErrNoRows
+		return
+	}
+
 	return
 }

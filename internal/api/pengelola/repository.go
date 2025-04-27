@@ -3,8 +3,6 @@ package pengelola
 import (
 	"context"
 	"database/sql"
-	"errors"
-	"fmt"
 	"log"
 
 	"github.com/farhansaleh/layanan_aptika_be/internal/domain"
@@ -55,16 +53,7 @@ func (r *RepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, id string) (r
 			LEFT JOIN role_pengelola as r ON p.role_id = r.id 
 			WHERE 
 			p.id = ?`
-
 	err = tx.QueryRowContext(ctx, SQL, id).Scan(&result.Id, &result.Nama, &result.Email, &result.NamaRole, &result.CreatedAt)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			err = fmt.Errorf("pengelola tidak ditemukan")
-			return
-		}
-		log.Println("ERROR QUERY: ", err)
-		return
-	}
 	return 
 }
 
@@ -93,6 +82,10 @@ func (r *RepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) (result []doma
 		}
 		result = append(result, u)
 	}
+	if result == nil {
+		err = sql.ErrNoRows
+		return
+	}
 
 	return	
 }
@@ -100,13 +93,5 @@ func (r *RepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) (result []doma
 func (r *RepositoryImpl) FindByEmail(ctx context.Context, tx *sql.Tx, email string) (result domain.Pengelola, err error) {
 	SQL := `SELECT id, nama, email, password, role_id FROM pengelola WHERE email = ?`
 	err = tx.QueryRowContext(ctx, SQL, email).Scan(&result.Id, &result.Nama, &result.Email, &result.Password, &result.RoleId)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			err = fmt.Errorf("pengelola tidak ditemukan")
-			return
-		}
-		log.Println("ERROR QUERY: ", err)
-		return
-	}
 	return
 }
