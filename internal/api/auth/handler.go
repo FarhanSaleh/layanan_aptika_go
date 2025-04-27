@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/farhansaleh/layanan_aptika_be/constants"
 	"github.com/farhansaleh/layanan_aptika_be/internal/domain"
 	"github.com/farhansaleh/layanan_aptika_be/pkg/helper"
 )
@@ -31,28 +32,15 @@ func (h *HandlerImpl) Login(w http.ResponseWriter, r *http.Request){
 
 	result, err := h.Service.Login(r.Context(), request)
 	if err != nil {
-		log.Println("Error Service: ", err)
-
-		validationErr, ok := helper.IsValidationError(err)
-		if ok {
-			helper.WriteResponseBody(w, http.StatusBadRequest, domain.ErrorValidationResponse{
-				Message: validationErr.Error(),
-				Errors: validationErr.Errors,
-			})
-			return
-		}
-
-		helper.WriteResponseBody(w, http.StatusBadRequest, domain.DefaultResponse{
-			Message: err.Error(),
-		})
+		log.Println("ERROR SERVICE: ", err)
+		helper.WriteErrorResponse(w, err)
 		return
 	}
 
-	response := domain.DefaultResponse{
-		Message: "Success Login",
+	helper.WriteResponseBody(w, http.StatusOK, domain.DefaultResponse{
+		Message: constants.SuccessLogin,
 		Data: result,
-	}
-	helper.WriteResponseBody(w, http.StatusOK, response)
+	})
 }
 
 func (h *HandlerImpl) PengelolaLogin(w http.ResponseWriter, r *http.Request){
@@ -61,28 +49,15 @@ func (h *HandlerImpl) PengelolaLogin(w http.ResponseWriter, r *http.Request){
 
 	result, err := h.Service.PengelolaLogin(r.Context(), request)
 	if err != nil {
-		log.Println("Error Service: ", err)
-
-		validationErr, ok := helper.IsValidationError(err)
-		if ok {
-			helper.WriteResponseBody(w, http.StatusBadRequest, domain.ErrorValidationResponse{
-				Message: validationErr.Error(),
-				Errors: validationErr.Errors,
-			})
-			return
-		}
-
-		helper.WriteResponseBody(w, http.StatusBadRequest, domain.DefaultResponse{
-			Message: err.Error(),
-		})
+		log.Println("ERROR SERVICE:", err)
+		helper.WriteErrorResponse(w, err)
 		return
 	}
 
-	response := domain.DefaultResponse{
-		Message: "Success Login",
+	helper.WriteResponseBody(w, http.StatusOK, domain.DefaultResponse{
+		Message: constants.SuccessLogin,
 		Data: result,
-	}
-	helper.WriteResponseBody(w, http.StatusOK, response)
+	})
 }
 
 func (h *HandlerImpl) Logout(w http.ResponseWriter, r *http.Request){
@@ -94,6 +69,7 @@ func (h *HandlerImpl) Logout(w http.ResponseWriter, r *http.Request){
 		Data: request,
 	})
 }
+
 func (h *HandlerImpl) ChangePassword(w http.ResponseWriter, r *http.Request){
 	
 }

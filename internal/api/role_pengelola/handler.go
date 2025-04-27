@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/farhansaleh/layanan_aptika_be/constants"
 	"github.com/farhansaleh/layanan_aptika_be/internal/domain"
 	"github.com/farhansaleh/layanan_aptika_be/pkg/helper"
 	"github.com/go-chi/chi/v5"
@@ -32,24 +33,13 @@ func (h *HandlerImpl) Create(w http.ResponseWriter, r *http.Request) {
 
 	result, err := h.Service.Create(r.Context(), request)
 	if err != nil {
-		log.Println("Error Service: ", err)
-
-		if validationErr, ok := helper.IsValidationError(err); ok {
-			helper.WriteResponseBody(w, http.StatusBadRequest, domain.ErrorValidationResponse{
-				Message: validationErr.Error(),
-				Errors: validationErr.Errors,
-			})
-			return
-		}
-
-		helper.WriteResponseBody(w, http.StatusBadRequest, domain.DefaultResponse{
-			Message: err.Error(),
-		})
+		log.Println("ERROR SERVICE:", err)
+		helper.WriteErrorResponse(w, err)
 		return
 	}
 
 	helper.WriteResponseBody(w, http.StatusOK, domain.DefaultResponse{
-		Message: "Success Insert Data",
+		Message: constants.SuccessInsert,
 		Data: result,
 	})
 }
@@ -61,23 +51,13 @@ func (h *HandlerImpl) Update(w http.ResponseWriter, r *http.Request) {
 	
 	result, err := h.Service.Update(r.Context(), request, id)
 	if err != nil {
-		log.Println("ERROR SERVICE: ", err)
-		if validationErr, ok := helper.IsValidationError(err); ok {
-			helper.WriteResponseBody(w, http.StatusBadRequest, domain.ErrorValidationResponse{
-				Message: validationErr.Error(),
-				Errors: validationErr.Errors,
-			})
-			return
-		}
-
-		helper.WriteResponseBody(w, http.StatusBadRequest, domain.DefaultResponse{
-			Message: err.Error(),
-		})
+		log.Println("ERROR SERVICE:", err)
+		helper.WriteErrorResponse(w, err)
 		return
 	}
 
 	helper.WriteResponseBody(w, http.StatusOK, domain.DefaultResponse{
-		Message: "Success Update",
+		Message: constants.SuccessUpdate,
 		Data: result,
 	})
 }
@@ -88,35 +68,26 @@ func (h *HandlerImpl) Delete(w http.ResponseWriter, r *http.Request) {
 	err := h.Service.Delete(r.Context(), id)
 	if err != nil {
 		log.Println("ERROR SERVICE:", err)
-		helper.WriteResponseBody(w, http.StatusBadRequest, domain.DefaultResponse{
-			Message: err.Error(),
-		})
+		helper.WriteErrorResponse(w, err)
 		return
 	}
 
 	helper.WriteResponseBody(w, http.StatusOK, domain.DefaultResponse{
-		Message: "Success Delete",
+		Message: constants.SuccessDelete,
 	})
 }
 
 func (h *HandlerImpl) FindAll(w http.ResponseWriter, r *http.Request) {
 	result, err := h.Service.FindAll(r.Context())
+	
 	if err != nil {
 		log.Println("ERROR SERVICE:", err)
-		helper.WriteResponseBody(w, http.StatusBadRequest, domain.DefaultResponse{
-			Message: err.Error(),
-		})
-		return
-	}
-	if result == nil {
-		helper.WriteResponseBody(w, http.StatusNotFound, domain.DefaultResponse{
-			Message: "Instansi Empty",
-		})
+		helper.WriteErrorResponse(w, err)
 		return
 	}
 
 	helper.WriteResponseBody(w, http.StatusOK, domain.DefaultResponse{
-		Message: "Success",
+		Message: constants.SuccessGetData,
 		Data: result,
 	})
 }
