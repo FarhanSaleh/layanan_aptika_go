@@ -33,7 +33,7 @@ func NewService(db *sql.DB, repository Repository, validate *validator.Validate)
 	}
 }
 
-func (s *ServiceImpl) Create(ctx context.Context, request domain.InstansiMutationRequest) (instansiResponse domain.InstansiResponse, err error) {
+func (s *ServiceImpl) Create(ctx context.Context, request domain.InstansiMutationRequest) (response domain.InstansiResponse, err error) {
 	keterangan := helper.StringToNullString(request.Keterangan)
 	
 	err = s.Validate.Struct(request)
@@ -58,7 +58,7 @@ func (s *ServiceImpl) Create(ctx context.Context, request domain.InstansiMutatio
 			return
 		}
 	
-		instansiResponse = domain.InstansiResponse{
+		response = domain.InstansiResponse{
 			Id:			instansi.Id,
 			Nama:    	instansi.Nama,
 			Alamat:  	instansi.Alamat,
@@ -70,7 +70,7 @@ func (s *ServiceImpl) Create(ctx context.Context, request domain.InstansiMutatio
 	return
 }
 
-func (s *ServiceImpl) Update(ctx context.Context, request domain.InstansiMutationRequest, id string) (instansiResponse domain.InstansiResponse, err error) {
+func (s *ServiceImpl) Update(ctx context.Context, request domain.InstansiMutationRequest, id string) (response domain.InstansiResponse, err error) {
 	err = s.Validate.Struct(request)
 	if err != nil {
 		log.Println("ERROR VALIDATE:", err)
@@ -100,7 +100,7 @@ func (s *ServiceImpl) Update(ctx context.Context, request domain.InstansiMutatio
 			return
 		}
 
-		instansiResponse = domain.InstansiResponse{
+		response = domain.InstansiResponse{
 			Id: id,
 			Nama: request.Nama,
 			Alamat: request.Alamat,
@@ -131,14 +131,14 @@ func (s *ServiceImpl) Delete(ctx context.Context, id string) (err error) {
 	return
 }
 
-func (s *ServiceImpl) FindById(ctx context.Context, id string) (instansiResponse domain.InstansiResponse, err error) {
+func (s *ServiceImpl) FindById(ctx context.Context, id string) (response domain.InstansiResponse, err error) {
 	err = helper.WithTransaction(s.DB, func(tx *sql.Tx) (err error) {
 		result, err := s.Repository.FindById(ctx, tx, id)
 		if err != nil{
 			log.Println("ERROR REPO <findById>:", err)
 			return
 		}
-		instansiResponse = domain.InstansiResponse{
+		response = domain.InstansiResponse{
 			Id: result.Id,
 			Nama: result.Nama,
 			Alamat: result.Nama,
@@ -149,8 +149,8 @@ func (s *ServiceImpl) FindById(ctx context.Context, id string) (instansiResponse
 	return
 }
 
-func (s *ServiceImpl) FindAll(ctx context.Context) (instansiResponse []domain.InstansiResponse, err error) {
-	helper.WithTransaction(s.DB, func(tx *sql.Tx) (err error) {
+func (s *ServiceImpl) FindAll(ctx context.Context) (response []domain.InstansiResponse, err error) {
+	err = helper.WithTransaction(s.DB, func(tx *sql.Tx) (err error) {
 		result, err := s.Repository.FindAll(ctx, tx)
 		if err != nil {
 			log.Println("ERROR REPO <findAll>:", err)
@@ -158,7 +158,7 @@ func (s *ServiceImpl) FindAll(ctx context.Context) (instansiResponse []domain.In
 		}
 
 		for _, instansi := range result {
-			instansiResponse = append(instansiResponse, domain.InstansiResponse{
+			response = append(response, domain.InstansiResponse{
 				Id: instansi.Id,
 				Nama: instansi.Nama,
 				Alamat: instansi.Alamat,

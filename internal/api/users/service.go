@@ -34,7 +34,7 @@ func NewService(db *sql.DB, repository Repository, validate *validator.Validate)
 	}
 }
 
-func (s *ServiceImpl) Create(ctx context.Context, request domain.UserMutationRequest) (userResponse domain.UserResponse, err error){
+func (s *ServiceImpl) Create(ctx context.Context, request domain.UserMutationRequest) (response domain.UserResponse, err error){
 	err = s.Validate.Struct(request)
 	if err != nil {
 		err = helper.MappingValidationError(err)
@@ -45,7 +45,7 @@ func (s *ServiceImpl) Create(ctx context.Context, request domain.UserMutationReq
 		uuid := uuid.NewString()
 		hashPassword, err := bcrypt.GenerateFromPassword([]byte("112233"), bcrypt.DefaultCost)
 		if err != nil {
-			log.Println("ERROR HASH PASSWORD: ", err)
+			log.Println("ERROR HASH PASSWORD:", err)
 			return
 		}
 		
@@ -58,10 +58,10 @@ func (s *ServiceImpl) Create(ctx context.Context, request domain.UserMutationReq
 	
 		err = s.Repository.Save(ctx, tx, &user)
 		if err != nil{
-			log.Println("Error repo: ", err)
+			log.Println("ERROR REPO <save>:", err)
 			return
 		}
-		userResponse = domain.UserResponse{
+		response = domain.UserResponse{
 			Id: user.Id,
 			Nama: user.Nama,
 			Email: user.Email,
@@ -72,7 +72,7 @@ func (s *ServiceImpl) Create(ctx context.Context, request domain.UserMutationReq
 	return
 }
 
-func (s *ServiceImpl) Update(ctx context.Context, request domain.UserMutationRequest, id string) (userResponse domain.UserResponse, err error){
+func (s *ServiceImpl) Update(ctx context.Context, request domain.UserMutationRequest, id string) (response domain.UserResponse, err error){
 	err = s.Validate.Struct(request)
 	if err != nil {
 		err = helper.MappingValidationError(err)
@@ -82,7 +82,7 @@ func (s *ServiceImpl) Update(ctx context.Context, request domain.UserMutationReq
 	err = helper.WithTransaction(s.DB, func(tx *sql.Tx) (err error) {
 		result, err := s.Repository.FindById(ctx, tx, id)
 		if err != nil {
-			log.Println("ERROR REPO:")
+			log.Println("ERROR REPO <findById>:")
 			return
 		}
 		
@@ -94,11 +94,11 @@ func (s *ServiceImpl) Update(ctx context.Context, request domain.UserMutationReq
 	
 		err = s.Repository.Update(ctx, tx, &result)
 		if err != nil{
-			log.Println("Error repo: ", err)
+			log.Println("ERROR REPO <update>:", err)
 			return
 		}
 	
-		userResponse = domain.UserResponse{
+		response = domain.UserResponse{
 			Id: id,
 			Nama: result.Nama,
 			Email: result.Email,
@@ -113,13 +113,13 @@ func (s *ServiceImpl) Delete(ctx context.Context, id string) (err error){
 	err = helper.WithTransaction(s.DB, func(tx *sql.Tx) (err error) {
 		user, err := s.Repository.FindById(ctx, tx, id)
 		if err != nil {
-			log.Println("Error Repository", err)
+			log.Println("ERROR REPO <findById>:", err)
 			return
 		}
 	
 		err = s.Repository.Delete(ctx, tx, user.Id)
 		if err != nil {
-			log.Println("Error Repository", err)
+			log.Println("ERROR REPO <delete>:", err)
 			return
 		}
 
@@ -128,18 +128,18 @@ func (s *ServiceImpl) Delete(ctx context.Context, id string) (err error){
 	return
 }
 
-func (s *ServiceImpl) FindById(ctx context.Context, id string) (userResponse domain.UserDetailResponse, err error){
+func (s *ServiceImpl) FindById(ctx context.Context, id string) (response domain.UserDetailResponse, err error){
 	err = helper.WithTransaction(s.DB, func(tx *sql.Tx) (err error) {
 		user, err := s.Repository.FindById(ctx, tx, id)
 		if err != nil {
-			log.Println("Error Repository", err)
+			log.Println("ERROR REPO <findById>:", err)
 			return
 		}
-		userResponse = domain.UserDetailResponse{
+		response = domain.UserDetailResponse{
 			Id: user.Id,
 			Nama: user.Nama,
 			Email: user.Email,
-			CreatedAt: user.CreatedAt.Format("02 January 2006 pukul 15:04"),
+			CreatedAt: user.CreatedAt.String(),
 		}
 		return
 	})
@@ -147,16 +147,16 @@ func (s *ServiceImpl) FindById(ctx context.Context, id string) (userResponse dom
 	return
 }
 
-func (s *ServiceImpl) FindAll(ctx context.Context) (userResponse []domain.UserResponse, err error){
+func (s *ServiceImpl) FindAll(ctx context.Context) (response []domain.UserResponse, err error){
 	err = helper.WithTransaction(s.DB, func(tx *sql.Tx) (err error) {
 		users, err := s.Repository.FindAll(ctx, tx)
 		if err != nil {
-			log.Println("Error Repository", err)
+			log.Println("ERROR REPO <findAll>:", err)
 			return
 		}
 	
 		for _, user := range users{
-			userResponse = append(userResponse, domain.UserResponse{
+			response = append(response, domain.UserResponse{
 				Id: user.Id,
 				Nama: user.Nama,
 				Email: user.Email,
@@ -164,7 +164,6 @@ func (s *ServiceImpl) FindAll(ctx context.Context) (userResponse []domain.UserRe
 		}
 		return
 	})
-
 
 	return
 }

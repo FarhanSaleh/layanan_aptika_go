@@ -115,7 +115,7 @@ func (s *ServiceImpl) Delete(ctx context.Context, id string) (err error) {
 }
 
 func (s *ServiceImpl) FindAll(ctx context.Context) (response []domain.RolePengelolaResponse, err error) {
-	helper.WithTransaction(s.DB, func(tx *sql.Tx) (err error) {
+	err = helper.WithTransaction(s.DB, func(tx *sql.Tx) (err error) {
 		result, err := s.Repository.FindAll(ctx, tx)
 		if err != nil {
 			log.Println("ERROR REPO <findAll>:", err)

@@ -45,7 +45,7 @@ func (s *ServiceImpl) Create(ctx context.Context, request domain.PengelolaMutati
 		uuid := uuid.NewString()
 		hashPassword, err := bcrypt.GenerateFromPassword([]byte("112233"), bcrypt.DefaultCost)
 		if err != nil {
-			log.Println("ERROR HASH PASSWORD: ", err)
+			log.Println("ERROR HASH PASSWORD:", err)
 			return
 		}
 		
@@ -59,7 +59,7 @@ func (s *ServiceImpl) Create(ctx context.Context, request domain.PengelolaMutati
 	
 		err = s.Repository.Save(ctx, tx, &pengelola)
 		if err != nil{
-			log.Println("Error repo: ", err)
+			log.Println("ERROR REPO <save>:", err)
 			return
 		}
 		response = domain.PengelolaMutateResponse{
@@ -84,7 +84,7 @@ func (s *ServiceImpl) Update(ctx context.Context, request domain.PengelolaMutati
 	err = helper.WithTransaction(s.DB, func(tx *sql.Tx) (err error) {
 		result, err := s.Repository.FindById(ctx, tx, id)
 		if err != nil {
-			log.Println("ERROR REPO:")
+			log.Println("ERROR REPO <findById>:")
 			return
 		}
 		
@@ -97,7 +97,7 @@ func (s *ServiceImpl) Update(ctx context.Context, request domain.PengelolaMutati
 	
 		err = s.Repository.Update(ctx, tx, &result)
 		if err != nil{
-			log.Println("Error repo: ", err)
+			log.Println("ERROR REPO <update>:", err)
 			return
 		}
 	
@@ -117,13 +117,13 @@ func (s *ServiceImpl) Delete(ctx context.Context, id string) (err error){
 	err = helper.WithTransaction(s.DB, func(tx *sql.Tx) (err error) {
 		pengelola, err := s.Repository.FindById(ctx, tx, id)
 		if err != nil {
-			log.Println("Error Repository", err)
+			log.Println("ERROR REPO <findById>:", err)
 			return
 		}
 	
 		err = s.Repository.Delete(ctx, tx, pengelola.Id)
 		if err != nil {
-			log.Println("Error Repository", err)
+			log.Println("ERROR REPO <delete>:", err)
 			return
 		}
 
@@ -136,7 +136,7 @@ func (s *ServiceImpl) FindById(ctx context.Context, id string) (response domain.
 	err = helper.WithTransaction(s.DB, func(tx *sql.Tx) (err error) {
 		pengelola, err := s.Repository.FindById(ctx, tx, id)
 		if err != nil {
-			log.Println("Error Repository", err)
+			log.Println("ERROR REPO <findById>:", err)
 			return
 		}
 		response = domain.PengelolaDetailResponse{
@@ -156,7 +156,7 @@ func (s *ServiceImpl) FindAll(ctx context.Context) (response []domain.PengelolaR
 	err = helper.WithTransaction(s.DB, func(tx *sql.Tx) (err error) {
 		result, err := s.Repository.FindAll(ctx, tx)
 		if err != nil {
-			log.Println("Error Repository", err)
+			log.Println("ERROR REPO <findAll>:", err)
 			return
 		}
 	
@@ -170,7 +170,6 @@ func (s *ServiceImpl) FindAll(ctx context.Context) (response []domain.PengelolaR
 		}
 		return
 	})
-
 
 	return
 }
