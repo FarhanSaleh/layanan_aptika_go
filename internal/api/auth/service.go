@@ -7,6 +7,7 @@ import (
 
 	"github.com/farhansaleh/layanan_aptika_be/internal/api/pengelola"
 	"github.com/farhansaleh/layanan_aptika_be/internal/api/users"
+	contextkey "github.com/farhansaleh/layanan_aptika_be/internal/context_key"
 	"github.com/farhansaleh/layanan_aptika_be/internal/domain"
 	"github.com/farhansaleh/layanan_aptika_be/pkg/helper"
 	"github.com/go-playground/validator/v10"
@@ -112,5 +113,39 @@ func (s *ServiceImpl) Logout(ctx context.Context) (err error) {
 }
 
 func (s *ServiceImpl) ChangePassword(ctx context.Context, request domain.ChangePasswordRequest) (err error) {
+	err = s.Validate.Struct(request)
+	if err != nil {
+		log.Println("ERROR VALIDATE:", err)
+		err = helper.MappingValidationError(err)
+		return
+	}
+	email := ctx.Value(contextkey.PengelolaKey).(string)
+	
+	err = helper.WithTransaction(s.DB, func(tx *sql.Tx) (err error) {
+		result, err := s.PengelolaRepository.FindByEmail(ctx, tx, email)
+		if err != nil {
+			log.Println("ERROR REPO <findByEmail>:", err)
+			return
+		}
+
+		err = bcrypt.CompareHashAndPassword([]byte(result.Password), []byte(request.OldPassword))
+		if err != nil {
+			log.Println("ERROR COMPARE PASSWORD: ", err)
+			err = helper.NewAuthError("password salah")
+			return
+		}
+
+		hashPassword, err := bcrypt.GenerateFromPassword([]byte(request.NewPassword), bcrypt.DefaultCost)
+		if err != nil {
+			log.Println("ERROR HASH PASSWORD:", err)
+			return
+		}
+		
+		result.Password = string(hashPassword)
+
+		err = s.PengelolaRepository.UpdatePassword(ctx, tx, &result)
+		return
+	})
+
 	return
 }

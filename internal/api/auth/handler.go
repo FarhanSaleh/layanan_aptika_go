@@ -71,5 +71,17 @@ func (h *HandlerImpl) Logout(w http.ResponseWriter, r *http.Request){
 }
 
 func (h *HandlerImpl) ChangePassword(w http.ResponseWriter, r *http.Request){
-	
+	request := domain.ChangePasswordRequest{}
+	helper.ParseBody(r, &request)
+
+	err := h.Service.ChangePassword(r.Context(), request)
+	if err != nil {
+		log.Println("ERROR SERVICE:", err)
+		helper.WriteErrorResponse(w, err)
+		return
+	}
+
+	helper.WriteResponseBody(w, http.StatusOK, domain.DefaultResponse{
+		Message: constants.SuccessUpdate,
+	})
 }

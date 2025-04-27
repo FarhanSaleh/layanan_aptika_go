@@ -15,6 +15,7 @@ type Repository interface {
 	FindById(ctx context.Context, tx *sql.Tx, id string) (domain.Pengelola, error)
 	FindAll(ctx context.Context, tx *sql.Tx) ([]domain.Pengelola, error)
 	FindByEmail(ctx context.Context, tx *sql.Tx, email string) (domain.Pengelola, error)
+	UpdatePassword(ctx context.Context, tx *sql.Tx, pengelola *domain.Pengelola) error
 }
 
 type RepositoryImpl struct{}
@@ -93,5 +94,11 @@ func (r *RepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) (result []doma
 func (r *RepositoryImpl) FindByEmail(ctx context.Context, tx *sql.Tx, email string) (result domain.Pengelola, err error) {
 	SQL := `SELECT id, nama, email, password, role_id FROM pengelola WHERE email = ?`
 	err = tx.QueryRowContext(ctx, SQL, email).Scan(&result.Id, &result.Nama, &result.Email, &result.Password, &result.RoleId)
+	return
+}
+
+func (r *RepositoryImpl) UpdatePassword(ctx context.Context, tx *sql.Tx, pengelola *domain.Pengelola) (err error) {
+	SQL := `UPDATE pengelola SET password = ? WHERE email = ?`
+	_, err = tx.ExecContext(ctx, SQL, pengelola.Password, pengelola.Email)
 	return
 }
