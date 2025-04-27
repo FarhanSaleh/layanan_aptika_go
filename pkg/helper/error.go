@@ -6,10 +6,15 @@ import (
 	"github.com/farhansaleh/layanan_aptika_be/internal/domain"
 	"github.com/go-playground/validator/v10"
 )
+type(
+	CustomValidationError struct {
+		Errors []domain.ErrorsValidation
+	}
+	AuthError struct {
+		Message string
+	}
+)
 
-type CustomValidationError struct {
-	Errors []domain.ErrorsValidation
-}
 
 func (e *CustomValidationError) Error() string {
 	return fmt.Sprintf("validation failed with %d errors", len(e.Errors))
@@ -33,4 +38,14 @@ func MappingValidationError(err error) error {
 func IsValidationError(err error) (*CustomValidationError, bool) {
 	validationErr, ok := err.(*CustomValidationError)
 	return validationErr, ok
+}
+
+func NewAuthError(message string) *AuthError {
+	return &AuthError{
+		Message: message,
+	}
+}
+
+func (e *AuthError) Error() string {
+	return e.Message
 }
