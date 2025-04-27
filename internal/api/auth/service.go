@@ -3,7 +3,6 @@ package auth
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"log"
 
 	"github.com/farhansaleh/layanan_aptika_be/internal/api/pengelola"
@@ -37,7 +36,7 @@ func NewService(db *sql.DB, userRepository users.Repository, pengelolaRepository
 	}
 }
 
-func (s *ServiceImpl) Login(ctx context.Context, request domain.LoginRequest) (loginResponse domain.LoginResponse, err error) {
+func (s *ServiceImpl) Login(ctx context.Context, request domain.LoginRequest) (response domain.LoginResponse, err error) {
 	err = s.Validate.Struct(request)
 	if err != nil {
 		log.Println("ERROR VALIDATE:", err)
@@ -48,30 +47,31 @@ func (s *ServiceImpl) Login(ctx context.Context, request domain.LoginRequest) (l
 	err = helper.WithTransaction(s.DB, func(tx *sql.Tx) (err error) {
 		user, err := s.UserRepository.FindByEmail(ctx, tx, request.Email)
 		if err != nil {
-			log.Println("Error repo: ", err)
+			log.Println("ERROR REPO <findByEmail>:", err)
+			err = helper.NewAuthError("email atau password salah")
 			return
 		}
 		
 		err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(request.Password))
 		if err != nil {
-			log.Println("Error compare password: ", err)
+			log.Println("ERROR COMPARE PASSWORD:", err)
+			err = helper.NewAuthError("email atau password salah")
 			return
 		}
 	
-		
 		token, err := helper.GenerateJWT(user)
 		if err != nil {
-			log.Println("Error Generate Token: ", err)
+			log.Println("ERROR GENERATE TOKEN:", err)
 			return
 		}
-		loginResponse.AccessToken = token
+		response.AccessToken = token
 		return
 	})
 	
 	return 
 }
 
-func (s *ServiceImpl) PengelolaLogin(ctx context.Context, request domain.LoginRequest) (loginResponse domain.LoginResponse, err error) {
+func (s *ServiceImpl) PengelolaLogin(ctx context.Context, request domain.LoginRequest) (response domain.LoginResponse, err error) {
 	err = s.Validate.Struct(request)
 	if err != nil {
 		log.Println("ERROR VALIDATE:", err)
@@ -82,24 +82,25 @@ func (s *ServiceImpl) PengelolaLogin(ctx context.Context, request domain.LoginRe
 	err = helper.WithTransaction(s.DB, func(tx *sql.Tx) (err error) {
 		pengelola, err := s.PengelolaRepository.FindByEmail(ctx, tx, request.Email)
 		if err != nil {
-			log.Println("Error repo: ", err)
+			log.Println("ERROR REPO <findByEmail>:", err)
+			err = helper.NewAuthError("email atau password salah")
 			return
 		}
 		
 		err = bcrypt.CompareHashAndPassword([]byte(pengelola.Password), []byte(request.Password))
 		if err != nil {
-			log.Println("Error compare password: ", err)
-			err = fmt.Errorf("password atau email salah")
+			log.Println("ERROR COMPARE PASSWORD: ", err)
+			err = helper.NewAuthError("email atau password salah")
 			return
 		}
 	
 		
 		token, err := helper.GeneratePengelolaJWT(pengelola)
 		if err != nil {
-			log.Println("Error Generate Token: ", err)
+			log.Println("ERROR GENERATE TOKEN: ", err)
 			return
 		}
-		loginResponse.AccessToken = token
+		response.AccessToken = token
 		return
 	})
 	
