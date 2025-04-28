@@ -37,6 +37,10 @@ func UserAuthMiddleware(next http.Handler) http.Handler {
             return
         }
 
+		tokenClaims := token.Claims.(*domain.JWTClaims)
+		ctx := context.WithValue(r.Context(), contextkey.UserKey, tokenClaims.Email)
+		r = r.WithContext(ctx)
+
 		next.ServeHTTP(w, r)
 	})
 }

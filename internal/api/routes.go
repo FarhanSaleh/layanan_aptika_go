@@ -39,6 +39,7 @@ func SetupRoutes(r chi.Router, db *sql.DB) {
 	// Protected routes user
 	r.Group(func(r chi.Router) {
 		r.Use(middlewares.UserAuthMiddleware)
+		r.Put("/change-password/user", authHandler.UserChangePassword)
 
 		r.Delete("/logout", authHandler.Logout)
 	})
@@ -70,10 +71,10 @@ func SetupRoutes(r chi.Router, db *sql.DB) {
 		r.Put("/role-pengelola/{id}", rolePengelolaHandler.Update)
 		r.Delete("/role-pengelola/{id}", rolePengelolaHandler.Delete)
 		
-		r.Put("/change-password", authHandler.ChangePassword)
+		r.Put("/change-password/pengelola", authHandler.PengelolaChangePassword)
 	})
 
 	// Public routes
-	r.Post("/login", authHandler.Login)
-	r.Post("/pengelola-login", authHandler.PengelolaLogin)
+	r.Post("/login/user", authHandler.Login)
+	r.Post("/login/pengelola", authHandler.PengelolaLogin)
 }

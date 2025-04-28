@@ -18,7 +18,8 @@ type Service interface {
 	Login(ctx context.Context, request domain.LoginRequest) (domain.LoginResponse, error)
 	PengelolaLogin(ctx context.Context, request domain.LoginRequest) (domain.LoginResponse, error)
 	Logout(ctx context.Context) error
-	ChangePassword(ctx context.Context, request domain.ChangePasswordRequest) error
+	PengelolaChangePassword(ctx context.Context, request domain.ChangePasswordRequest) error
+	UserChangePassword(ctx context.Context, request domain.ChangePasswordRequest) error
 }
 
 type ServiceImpl struct {
@@ -112,7 +113,45 @@ func (s *ServiceImpl) Logout(ctx context.Context) (err error) {
 	return
 }
 
-func (s *ServiceImpl) ChangePassword(ctx context.Context, request domain.ChangePasswordRequest) (err error) {
+func (s *ServiceImpl) UserChangePassword(ctx context.Context, request domain.ChangePasswordRequest) (err error) {
+	err = s.Validate.Struct(request)
+	if err != nil {
+		log.Println("ERROR VALIDATE:", err)
+		err = helper.MappingValidationError(err)
+		return
+	}
+	email := ctx.Value(contextkey.UserKey).(string)
+	
+	err = helper.WithTransaction(s.DB, func(tx *sql.Tx) (err error) {
+		result, err := s.UserRepository.FindByEmail(ctx, tx, email)
+		if err != nil {
+			log.Println("ERROR REPO <findByEmail>:", err)
+			return
+		}
+
+		err = bcrypt.CompareHashAndPassword([]byte(result.Password), []byte(request.OldPassword))
+		if err != nil {
+			log.Println("ERROR COMPARE PASSWORD: ", err)
+			err = helper.NewAuthError("password salah")
+			return
+		}
+
+		hashPassword, err := bcrypt.GenerateFromPassword([]byte(request.NewPassword), bcrypt.DefaultCost)
+		if err != nil {
+			log.Println("ERROR HASH PASSWORD:", err)
+			return
+		}
+		
+		result.Password = string(hashPassword)
+
+		err = s.UserRepository.UpdatePassword(ctx, tx, &result)
+		return
+	})
+
+	return
+}
+
+func (s *ServiceImpl) PengelolaChangePassword(ctx context.Context, request domain.ChangePasswordRequest) (err error) {
 	err = s.Validate.Struct(request)
 	if err != nil {
 		log.Println("ERROR VALIDATE:", err)

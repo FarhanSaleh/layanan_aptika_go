@@ -13,7 +13,8 @@ type Handler interface {
 	Login(w http.ResponseWriter, r *http.Request)
 	PengelolaLogin(w http.ResponseWriter, r *http.Request)
 	Logout(w http.ResponseWriter, r *http.Request)
-	ChangePassword(w http.ResponseWriter, r *http.Request)
+	PengelolaChangePassword(w http.ResponseWriter, r *http.Request)
+	UserChangePassword(w http.ResponseWriter, r *http.Request)
 }
 
 type HandlerImpl struct {
@@ -70,11 +71,27 @@ func (h *HandlerImpl) Logout(w http.ResponseWriter, r *http.Request){
 	})
 }
 
-func (h *HandlerImpl) ChangePassword(w http.ResponseWriter, r *http.Request){
+func (h *HandlerImpl) PengelolaChangePassword(w http.ResponseWriter, r *http.Request){
 	request := domain.ChangePasswordRequest{}
 	helper.ParseBody(r, &request)
 
-	err := h.Service.ChangePassword(r.Context(), request)
+	err := h.Service.PengelolaChangePassword(r.Context(), request)
+	if err != nil {
+		log.Println("ERROR SERVICE:", err)
+		helper.WriteErrorResponse(w, err)
+		return
+	}
+
+	helper.WriteResponseBody(w, http.StatusOK, domain.DefaultResponse{
+		Message: constants.SuccessUpdate,
+	})
+}
+
+func (h *HandlerImpl) UserChangePassword(w http.ResponseWriter, r *http.Request){
+	request := domain.ChangePasswordRequest{}
+	helper.ParseBody(r, &request)
+
+	err := h.Service.UserChangePassword(r.Context(), request)
 	if err != nil {
 		log.Println("ERROR SERVICE:", err)
 		helper.WriteErrorResponse(w, err)
