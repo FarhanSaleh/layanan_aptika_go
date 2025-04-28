@@ -25,5 +25,5 @@ type InstansiResponse struct {
 type InstansiMutationRequest struct {
 	Nama       string `json:"nama" validate:"required"`
 	Alamat     string `json:"alamat" validate:"required"`
-	Keterangan string `json:"keterangan" validate:"alphanum"`
+	Keterangan string `json:"keterangan" validate:"ascii"`
 }
