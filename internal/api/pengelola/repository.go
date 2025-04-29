@@ -47,6 +47,7 @@ func (r *RepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, id string) (r
 			p.id, 
 			p.nama, 
 			p.email, 
+			p.role_id,
 			r.nama as nama_role,
 			p.created_at
 			FROM 
@@ -54,7 +55,7 @@ func (r *RepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, id string) (r
 			LEFT JOIN role_pengelola as r ON p.role_id = r.id 
 			WHERE 
 			p.id = ?`
-	err = tx.QueryRowContext(ctx, SQL, id).Scan(&result.Id, &result.Nama, &result.Email, &result.NamaRole, &result.CreatedAt)
+	err = tx.QueryRowContext(ctx, SQL, id).Scan(&result.Id, &result.Nama, &result.Email, &result.RoleId, &result.NamaRole, &result.CreatedAt)
 	return 
 }
 
@@ -63,6 +64,7 @@ func (r *RepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) (result []doma
 			p.id, 
 			p.nama, 
 			p.email,
+			p.role_id,
 			r.nama as nama_role
 			FROM pengelola as p
 			LEFT JOIN role_pengelola as r ON p.role_id = r.id`
@@ -76,7 +78,7 @@ func (r *RepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) (result []doma
 
 	for rows.Next() {
 		var u domain.Pengelola
-		err = rows.Scan(&u.Id, &u.Nama, &u.Email, &u.NamaRole)
+		err = rows.Scan(&u.Id, &u.Nama, &u.Email, &u.RoleId, &u.NamaRole)
 		if err != nil{
 			log.Println("ERROR SCANNING: ", err)
 			return 
@@ -92,8 +94,17 @@ func (r *RepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) (result []doma
 }
 
 func (r *RepositoryImpl) FindByEmail(ctx context.Context, tx *sql.Tx, email string) (result domain.Pengelola, err error) {
-	SQL := `SELECT id, nama, email, password, role_id FROM pengelola WHERE email = ?`
-	err = tx.QueryRowContext(ctx, SQL, email).Scan(&result.Id, &result.Nama, &result.Email, &result.Password, &result.RoleId)
+	SQL := `SELECT 
+			p.id, 
+			p.nama, 
+			p.email, 
+			p.password, 
+			p.role_id, 
+			r.nama as nama_role 
+			FROM pengelola as p 
+			LEFT JOIN role_pengelola as r ON p.role_id 
+			WHERE email = ?`
+	err = tx.QueryRowContext(ctx, SQL, email).Scan(&result.Id, &result.Nama, &result.Email, &result.Password, &result.RoleId, &result.NamaRole)
 	return
 }
 

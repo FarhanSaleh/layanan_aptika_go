@@ -14,6 +14,7 @@ func GenerateJWT(user domain.User) (tokenString string, err error) {
 
 	expTime := time.Now().Add(time.Hour)
 	claims := domain.JWTClaims{
+		UID: user.Id,
 		Email: user.Email,
 		Nama:  user.Nama,
 		RegisteredClaims: jwt.RegisteredClaims{
@@ -36,8 +37,10 @@ func GeneratePengelolaJWT(pengelola domain.Pengelola) (tokenString string, err e
 
 	expTime := time.Now().Add(time.Hour)
 	claims := domain.JWTClaims{
+		UID: pengelola.Id,
 		Email: pengelola.Email,
 		Nama:  pengelola.Nama,
+		RoleName: pengelola.NamaRole,
 		RoleId: pengelola.RoleId,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expTime),

@@ -29,6 +29,7 @@ type PengelolaResponse struct {
 	Id    	 string `json:"id"`
 	Nama  	 string `json:"nama"`
 	Email	 string `json:"email"`
+	RoleId 	 string `json:"role_id"`
 	NamaRole string `json:"nama_role"`
 }
 
@@ -36,6 +37,7 @@ type PengelolaDetailResponse struct {
 	Id        string `json:"id"`
 	Nama      string `json:"nama"`
 	Email     string `json:"email"`
+	RoleId 	  string `json:"role_id"`
 	NamaRole  string `json:"nama_role"`
 	CreatedAt string `json:"created_at"`
 }

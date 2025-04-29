@@ -143,6 +143,7 @@ func (s *ServiceImpl) FindById(ctx context.Context, id string) (response domain.
 			Id: pengelola.Id,
 			Nama: pengelola.Nama,
 			Email: pengelola.Email,
+			RoleId: pengelola.RoleId,
 			NamaRole: pengelola.NamaRole,
 			CreatedAt: pengelola.CreatedAt.GoString(),
 		}
@@ -165,6 +166,7 @@ func (s *ServiceImpl) FindAll(ctx context.Context) (response []domain.PengelolaR
 				Id: pengelola.Id,
 				Nama: pengelola.Nama,
 				Email: pengelola.Email,
+				RoleId: pengelola.RoleId,
 				NamaRole: pengelola.NamaRole,
 			})
 		}
