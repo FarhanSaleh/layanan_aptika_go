@@ -132,7 +132,7 @@ func (s *ServiceImpl) UserChangePassword(ctx context.Context, request domain.Cha
 		err = bcrypt.CompareHashAndPassword([]byte(result.Password), []byte(request.OldPassword))
 		if err != nil {
 			log.Println("ERROR COMPARE PASSWORD: ", err)
-			err = helper.NewAuthError("password salah")
+			err = helper.NewBadRequestError("password salah")
 			return
 		}
 
@@ -170,7 +170,7 @@ func (s *ServiceImpl) PengelolaChangePassword(ctx context.Context, request domai
 		err = bcrypt.CompareHashAndPassword([]byte(result.Password), []byte(request.OldPassword))
 		if err != nil {
 			log.Println("ERROR COMPARE PASSWORD: ", err)
-			err = helper.NewAuthError("password salah")
+			err = helper.NewBadRequestError("password salah")
 			return
 		}
 

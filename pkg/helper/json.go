@@ -63,6 +63,14 @@ func WriteErrorResponse(w http.ResponseWriter, err error) {
 		return
 	}
 
+	// bad request error check
+	if badRequestErr, ok := err.(*BadRequestError); ok {
+		WriteResponseBody(w, http.StatusBadRequest, domain.DefaultResponse{
+			Message: badRequestErr.Message,
+		})
+		return
+	}
+
 	// error no rows
 	if errors.Is(err, sql.ErrNoRows){
 		WriteResponseBody(w, http.StatusNotFound, domain.DefaultResponse{

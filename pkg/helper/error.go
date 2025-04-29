@@ -13,6 +13,9 @@ type(
 	AuthError struct {
 		Message string
 	}
+	BadRequestError struct {
+		Message string
+	}
 )
 
 
@@ -46,6 +49,16 @@ func NewAuthError(message string) *AuthError {
 	}
 }
 
+func NewBadRequestError(message string) *BadRequestError {
+	return &BadRequestError{
+		Message: message,
+	}
+}
+
 func (e *AuthError) Error() string {
+	return e.Message
+}
+
+func (e *BadRequestError) Error() string {
 	return e.Message
 }
