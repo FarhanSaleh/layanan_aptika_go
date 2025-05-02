@@ -2,8 +2,11 @@ package api
 
 import (
 	"database/sql"
+	"net/http"
+	"path/filepath"
 
 	"github.com/farhansaleh/layanan_aptika_be/internal/api/auth"
+	gangguanjip "github.com/farhansaleh/layanan_aptika_be/internal/api/gangguan-jip"
 	"github.com/farhansaleh/layanan_aptika_be/internal/api/instansi"
 	"github.com/farhansaleh/layanan_aptika_be/internal/api/pengelola"
 	rolepengelola "github.com/farhansaleh/layanan_aptika_be/internal/api/role_pengelola"
@@ -35,11 +38,26 @@ func SetupRoutes(r chi.Router, db *sql.DB) {
 	instansiHandler := instansi.NewHandler(instansiService)
 	rolePengelolaHandler := rolepengelola.NewHandler(rolePengelolaService)
 	pengelolaHandler := pengelola.NewHandler(pengelolaService)
+	gangguanJIPHandler := gangguanjip.NewHandler()
 	
 	// Protected routes user
 	r.Group(func(r chi.Router) {
 		r.Use(middlewares.UserAuthMiddleware)
 		r.Put("/change-password/user", authHandler.UserChangePassword)
+		r.Get("/uploads/user/img/*", func(w http.ResponseWriter, r *http.Request) {
+			path := chi.URLParam(r, "*")
+			filePath := filepath.Join("uploads", "img", path)
+			
+			http.ServeFile(w, r, filePath)
+		})
+		r.Get("/uploads/user/docs/*", func(w http.ResponseWriter, r *http.Request) {
+			path := chi.URLParam(r, "*")
+			filePath := filepath.Join("uploads", "docs", path)
+			
+			http.ServeFile(w, r, filePath)
+		})
+
+		r.Post("/gangguan-jip", gangguanJIPHandler.Create)
 
 		r.Delete("/logout", authHandler.Logout)
 	})
@@ -47,6 +65,18 @@ func SetupRoutes(r chi.Router, db *sql.DB) {
 	// Protected routes pengelola
 	r.Group(func(r chi.Router) {
 		r.Use(middlewares.PengelolaAuthMiddleware)
+		r.Get("/uploads/pengelola/img/*", func(w http.ResponseWriter, r *http.Request) {
+			path := chi.URLParam(r, "*")
+			filePath := filepath.Join("uploads", "img", path)
+			
+			http.ServeFile(w, r, filePath)
+		})
+		r.Get("/uploads/pengelola/docs/*", func(w http.ResponseWriter, r *http.Request) {
+			path := chi.URLParam(r, "*")
+			filePath := filepath.Join("uploads", "docs", path)
+			
+			http.ServeFile(w, r, filePath)
+		})
 		
 		r.Post("/pengelola", pengelolaHandler.Create)
 		r.Put("/pengelola/{id}", pengelolaHandler.Update)

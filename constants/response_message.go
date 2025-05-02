@@ -21,4 +21,8 @@ const (
 	ErrorInvalidLogin  = "Email atau kata sandi salah."
 	ErrorUnauthorized  = "Akses tidak diizinkan."
 	ErrorAccountExists = "Akun dengan email tersebut sudah terdaftar."
+
+	// File max size
+	MaxBytesReader = 20 << 20
+	MaxUploadSize = 10 << 20
 )

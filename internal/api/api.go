@@ -25,7 +25,7 @@ func NewAPIServer(addr string, config *config.Config) *APIServer {
 
 func (s *APIServer) Run() error {
 	r := chi.NewRouter()
-	r.Use(middleware.Logger)
+	// r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins: s.config.AllowedOrigins,
@@ -40,11 +40,10 @@ func (s *APIServer) Run() error {
 		return err
 	}
 	initStorage(db)
-
+	
 	apiRoutes := chi.NewRouter()
 	SetupRoutes(apiRoutes, db)
 	r.Mount("/api/v1", apiRoutes)
-
 	log.Printf("Server running at port localhost%s", s.addr)
 	return http.ListenAndServe(s.addr, r)
 }
