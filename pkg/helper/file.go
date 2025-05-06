@@ -15,6 +15,7 @@ import (
 func HandleUploadImage(w http.ResponseWriter, r *http.Request, fieldName string) (fileName string, err error) {
 	file, _, err := r.FormFile(fieldName)
 	if err != nil {
+		err = nil
 		return
 	}
 	defer file.Close()
@@ -53,6 +54,7 @@ func HandleUploadImage(w http.ResponseWriter, r *http.Request, fieldName string)
 func HandleUploadPdf(w http.ResponseWriter, r *http.Request, fieldName string) (fileName string, err error) {
 	file, _, err := r.FormFile(fieldName)
 	if err != nil {
+		err = nil
 		return
 	}
 	defer file.Close()
@@ -104,4 +106,13 @@ func GetMimeTypeFromMultipartForm(file multipart.File) (mimeType string, ext str
 	ext = strings.Split(mimeType, "/")[1]
 
 	return
+}
+
+func CheckFormFile(r *http.Request, fieldName string) error {
+	file, _, err := r.FormFile(fieldName)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	return nil
 }
