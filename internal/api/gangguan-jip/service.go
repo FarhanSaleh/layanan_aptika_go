@@ -165,6 +165,11 @@ func (s *ServiceImpl) Delete(ctx context.Context, id string) (err error) {
 			return
 		}
 
+		if result.Status != "diproses" {
+			err = helper.NewBadRequestError("tidak dapat dihapus karena statusnya bukan diproses")
+			return
+		}
+
 		err = s.Repository.Delete(ctx, tx, result.Id)
 		if err != nil {
 			log.Println("ERROR REPO <delete>:")

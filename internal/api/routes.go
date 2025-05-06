@@ -60,12 +60,10 @@ func SetupRoutes(r chi.Router, db *sql.DB, config *config.Config) {
 			http.ServeFile(w, r, filePath)
 		})
 
-		r.Get("/gangguan-jip", gangguanJIPHandler.FindAll)
 		r.Post("/gangguan-jip", gangguanJIPHandler.Create)
-		r.Get("/gangguan-jip/{id}", gangguanJIPHandler.FindById)
 		r.Put("/gangguan-jip/{id}", gangguanJIPHandler.Update)
-		r.Patch("/gangguan-jip/{id}", gangguanJIPHandler.UpdateStatus)
 		r.Delete("/gangguan-jip/{id}", gangguanJIPHandler.Delete)
+		r.Get("/gangguan-jip/me/{id}", gangguanJIPHandler.FindById)
 		r.Get("/gangguan-jip/me", gangguanJIPHandler.FindByUser)
 
 		r.Delete("/logout", authHandler.Logout)
@@ -109,6 +107,10 @@ func SetupRoutes(r chi.Router, db *sql.DB, config *config.Config) {
 		r.Get("/role-pengelola", rolePengelolaHandler.FindAll)
 		r.Put("/role-pengelola/{id}", rolePengelolaHandler.Update)
 		r.Delete("/role-pengelola/{id}", rolePengelolaHandler.Delete)
+
+		r.Get("/gangguan-jip", gangguanJIPHandler.FindAll)
+		r.Get("/gangguan-jip/{id}", gangguanJIPHandler.FindById)
+		r.Patch("/gangguan-jip/{id}", gangguanJIPHandler.UpdateStatus)
 		
 		r.Put("/change-password/pengelola", authHandler.PengelolaChangePassword)
 	})
