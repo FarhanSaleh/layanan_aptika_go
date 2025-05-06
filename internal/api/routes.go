@@ -8,6 +8,7 @@ import (
 	gangguanjip "github.com/farhansaleh/layanan_aptika_be/internal/api/gangguan-jip"
 	"github.com/farhansaleh/layanan_aptika_be/internal/api/instansi"
 	"github.com/farhansaleh/layanan_aptika_be/internal/api/pengelola"
+	perubahanipserver "github.com/farhansaleh/layanan_aptika_be/internal/api/perubahan_ip_server"
 	rolepengelola "github.com/farhansaleh/layanan_aptika_be/internal/api/role_pengelola"
 	"github.com/farhansaleh/layanan_aptika_be/internal/api/static"
 	"github.com/farhansaleh/layanan_aptika_be/internal/api/users"
@@ -25,6 +26,7 @@ func SetupRoutes(r chi.Router, db *sql.DB, config *config.Config) {
 	rolePengelolaRepository := rolepengelola.NewRepository()
 	pengelolaRepository := pengelola.NewRepository()
 	gangguanJIPRepository := gangguanjip.NewRepository()
+	perubahanIPServerRepository := perubahanipserver.NewRepository()
 
 	// Service
 	usersServices := users.NewService(db, usersRepository, validator)
@@ -33,6 +35,7 @@ func SetupRoutes(r chi.Router, db *sql.DB, config *config.Config) {
 	rolePengelolaService := rolepengelola.NewService(db, rolePengelolaRepository, validator)
 	pengelolaService := pengelola.NewService(db, pengelolaRepository, validator)
 	gangguanJIPService := gangguanjip.NewService(db, gangguanJIPRepository, validator, config) 
+	perubahanIPServerService := perubahanipserver.NewService(db, perubahanIPServerRepository, validator, config)
 	
 	// Handler
 	usersHandler := users.NewHandler(usersServices)
@@ -41,20 +44,27 @@ func SetupRoutes(r chi.Router, db *sql.DB, config *config.Config) {
 	rolePengelolaHandler := rolepengelola.NewHandler(rolePengelolaService)
 	pengelolaHandler := pengelola.NewHandler(pengelolaService)
 	gangguanJIPHandler := gangguanjip.NewHandler(gangguanJIPService)
+	perubahanIPServerHandler := perubahanipserver.NewHandler(perubahanIPServerService)
 	staticHandler := static.NewHandler()
 	
 	// Protected routes user
 	r.Group(func(r chi.Router) {
 		r.Use(middlewares.UserAuthMiddleware)
 		r.Put("/change-password/user", authHandler.UserChangePassword)
-		r.Get("/uploads/user/img/*", staticHandler.Image)
-		r.Get("/uploads/user/docs/*", staticHandler.Document)
+		r.Get("/uploads/user/img/{filename}", staticHandler.Image)
+		r.Get("/uploads/user/docs/{filename}", staticHandler.Document)
 
 		r.Post("/gangguan-jip", gangguanJIPHandler.Create)
 		r.Put("/gangguan-jip/{id}", gangguanJIPHandler.Update)
 		r.Delete("/gangguan-jip/{id}", gangguanJIPHandler.Delete)
 		r.Get("/gangguan-jip/me/{id}", gangguanJIPHandler.FindById)
 		r.Get("/gangguan-jip/me", gangguanJIPHandler.FindByUser)
+		
+		r.Post("/perubahan-ip-server", perubahanIPServerHandler.Create)
+		r.Put("/perubahan-ip-server/{id}", perubahanIPServerHandler.Update)
+		r.Delete("/perubahan-ip-server/{id}", perubahanIPServerHandler.Delete)
+		r.Get("/perubahan-ip-server/me/{id}", perubahanIPServerHandler.FindById)
+		r.Get("/perubahan-ip-server/me", perubahanIPServerHandler.FindByUser)
 
 		r.Delete("/logout", authHandler.Logout)
 	})
@@ -62,8 +72,8 @@ func SetupRoutes(r chi.Router, db *sql.DB, config *config.Config) {
 	// Protected routes pengelola
 	r.Group(func(r chi.Router) {
 		r.Use(middlewares.PengelolaAuthMiddleware)
-		r.Get("/uploads/pengelola/img/*", staticHandler.Image)
-		r.Get("/uploads/pengelola/docs/*", staticHandler.Document)
+		r.Get("/uploads/pengelola/img/{filename}", staticHandler.Image)
+		r.Get("/uploads/pengelola/docs/{filename}", staticHandler.Document)
 		
 		r.Post("/pengelola", pengelolaHandler.Create)
 		r.Put("/pengelola/{id}", pengelolaHandler.Update)
@@ -91,6 +101,10 @@ func SetupRoutes(r chi.Router, db *sql.DB, config *config.Config) {
 		r.Get("/gangguan-jip", gangguanJIPHandler.FindAll)
 		r.Get("/gangguan-jip/{id}", gangguanJIPHandler.FindById)
 		r.Patch("/gangguan-jip/{id}", gangguanJIPHandler.UpdateStatus)
+
+		r.Get("/perubahan-ip-server", perubahanIPServerHandler.FindAll)
+		r.Get("/perubahan-ip-server/{id}", perubahanIPServerHandler.FindById)
+		r.Patch("/perubahan-ip-server/{id}", perubahanIPServerHandler.UpdateStatus)
 		
 		r.Put("/change-password/pengelola", authHandler.PengelolaChangePassword)
 	})
