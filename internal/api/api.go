@@ -42,7 +42,7 @@ func (s *APIServer) Run() error {
 	initStorage(db)
 	
 	apiRoutes := chi.NewRouter()
-	SetupRoutes(apiRoutes, db)
+	SetupRoutes(apiRoutes, db, s.config)
 	r.Mount("/api/v1", apiRoutes)
 	log.Printf("Server running at port localhost%s", s.addr)
 	return http.ListenAndServe(s.addr, r)

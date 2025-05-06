@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"path/filepath"
 
+	"github.com/farhansaleh/layanan_aptika_be/config"
 	"github.com/farhansaleh/layanan_aptika_be/internal/api/auth"
 	gangguanjip "github.com/farhansaleh/layanan_aptika_be/internal/api/gangguan-jip"
 	"github.com/farhansaleh/layanan_aptika_be/internal/api/instansi"
@@ -16,7 +17,7 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-func SetupRoutes(r chi.Router, db *sql.DB) {
+func SetupRoutes(r chi.Router, db *sql.DB, config *config.Config) {
 	validator := validator.New()
 
 	// Repository
@@ -24,6 +25,7 @@ func SetupRoutes(r chi.Router, db *sql.DB) {
 	instansiRepository := instansi.NewRepository()
 	rolePengelolaRepository := rolepengelola.NewRepository()
 	pengelolaRepository := pengelola.NewRepository()
+	gangguanJIPRepository := gangguanjip.NewRepository()
 
 	// Service
 	usersServices := users.NewService(db, usersRepository, validator)
@@ -31,6 +33,7 @@ func SetupRoutes(r chi.Router, db *sql.DB) {
 	instansiService := instansi.NewService(db, instansiRepository, validator)
 	rolePengelolaService := rolepengelola.NewService(db, rolePengelolaRepository, validator)
 	pengelolaService := pengelola.NewService(db, pengelolaRepository, validator)
+	gangguanJIPService := gangguanjip.NewService(db, gangguanJIPRepository, validator, config) 
 	
 	// Handler
 	usersHandler := users.NewHandler(usersServices)
@@ -38,7 +41,7 @@ func SetupRoutes(r chi.Router, db *sql.DB) {
 	instansiHandler := instansi.NewHandler(instansiService)
 	rolePengelolaHandler := rolepengelola.NewHandler(rolePengelolaService)
 	pengelolaHandler := pengelola.NewHandler(pengelolaService)
-	gangguanJIPHandler := gangguanjip.NewHandler()
+	gangguanJIPHandler := gangguanjip.NewHandler(gangguanJIPService)
 	
 	// Protected routes user
 	r.Group(func(r chi.Router) {
@@ -57,7 +60,13 @@ func SetupRoutes(r chi.Router, db *sql.DB) {
 			http.ServeFile(w, r, filePath)
 		})
 
+		r.Get("/gangguan-jip", gangguanJIPHandler.FindAll)
 		r.Post("/gangguan-jip", gangguanJIPHandler.Create)
+		r.Get("/gangguan-jip/{id}", gangguanJIPHandler.FindById)
+		r.Put("/gangguan-jip/{id}", gangguanJIPHandler.Update)
+		r.Patch("/gangguan-jip/{id}", gangguanJIPHandler.UpdateStatus)
+		r.Delete("/gangguan-jip/{id}", gangguanJIPHandler.Delete)
+		r.Get("/gangguan-jip/me", gangguanJIPHandler.FindByUser)
 
 		r.Delete("/logout", authHandler.Logout)
 	})
