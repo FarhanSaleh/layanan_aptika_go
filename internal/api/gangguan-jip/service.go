@@ -220,20 +220,20 @@ func (s *ServiceImpl) FindAll(ctx context.Context) (response []domain.GangguanJI
 			return
 		}
 
-		for _, pengelola := range result {
-			suratPermohonanUrl := s.Config.StaticDocsOriginUser + pengelola.SuratPermohonan
+		for _, gangguanJIP := range result {
+			suratPermohonanUrl := s.Config.StaticDocsOriginUser + gangguanJIP.SuratPermohonan
 
 			response = append(response, domain.GangguanJIPResponse{
-				Id: pengelola.Id,
-				NamaLengkap: pengelola.NamaLengkap,
-				Jabatan: pengelola.Jabatan,
-				NomorHP: pengelola.NomorHP,
-				LokasiGangguan: pengelola.LokasiGangguan,
+				Id: gangguanJIP.Id,
+				NamaLengkap: gangguanJIP.NamaLengkap,
+				Jabatan: gangguanJIP.Jabatan,
+				NomorHP: gangguanJIP.NomorHP,
+				LokasiGangguan: gangguanJIP.LokasiGangguan,
 				SuratPermohonan: suratPermohonanUrl,
-				InstansiId: pengelola.InstansiId,
-				Status: pengelola.Status,
-				NamaInstansi: pengelola.NamaInstansi,
-				CreatedAt: pengelola.CreatedAt.String(),
+				InstansiId: gangguanJIP.InstansiId,
+				Status: gangguanJIP.Status,
+				NamaInstansi: gangguanJIP.NamaInstansi,
+				CreatedAt: gangguanJIP.CreatedAt.String(),
 			})
 		}
 		return
@@ -250,20 +250,20 @@ func (s *ServiceImpl) FindAllByUser(ctx context.Context) (response []domain.Gang
 			return
 		}
 
-		for _, pengelola := range result {
-			suratPermohonanUrl := s.Config.StaticDocsOriginUser + pengelola.SuratPermohonan
+		for _, gangguanJIP := range result {
+			suratPermohonanUrl := s.Config.StaticDocsOriginUser + gangguanJIP.SuratPermohonan
 
 			response = append(response, domain.GangguanJIPResponse{
-				Id: pengelola.Id,
-				NamaLengkap: pengelola.NamaLengkap,
-				Jabatan: pengelola.Jabatan,
-				NomorHP: pengelola.NomorHP,
-				LokasiGangguan: pengelola.LokasiGangguan,
+				Id: gangguanJIP.Id,
+				NamaLengkap: gangguanJIP.NamaLengkap,
+				Jabatan: gangguanJIP.Jabatan,
+				NomorHP: gangguanJIP.NomorHP,
+				LokasiGangguan: gangguanJIP.LokasiGangguan,
 				SuratPermohonan: suratPermohonanUrl,
-				InstansiId: pengelola.InstansiId,
-				Status: pengelola.Status,
-				NamaInstansi: pengelola.NamaInstansi,
-				CreatedAt: pengelola.CreatedAt.String(),
+				InstansiId: gangguanJIP.InstansiId,
+				Status: gangguanJIP.Status,
+				NamaInstansi: gangguanJIP.NamaInstansi,
+				CreatedAt: gangguanJIP.CreatedAt.String(),
 			})
 		}
 		return
