@@ -120,7 +120,7 @@ func (s *ServiceImpl) UserChangePassword(ctx context.Context, request domain.Cha
 		err = helper.MappingValidationError(err)
 		return
 	}
-	email := ctx.Value(contextkey.UserKey).(string)
+	email := ctx.Value(contextkey.UserKey).(*domain.JWTClaims).Email
 	
 	err = helper.WithTransaction(s.DB, func(tx *sql.Tx) (err error) {
 		result, err := s.UserRepository.FindByEmail(ctx, tx, email)
