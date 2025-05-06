@@ -2,7 +2,7 @@ package domain
 
 type DefaultResponse struct {
 	Message string `json:"message"`
-	Data    any    `json:"data,omitempty"`
+	Data    any    `json:"data"`
 }
 
 type ErrorValidationResponse struct {
