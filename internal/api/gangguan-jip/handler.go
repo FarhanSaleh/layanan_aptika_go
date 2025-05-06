@@ -46,10 +46,10 @@ func (h *HandlerImpl) Create(w http.ResponseWriter, r *http.Request) {
 		helper.WriteErrorResponse(w, fmt.Errorf("foto is required"))
 		return
 	}
-	err = helper.CheckFormFile(r, "surat")
+	err = helper.CheckFormFile(r, "surat_permohonan")
 	if err != nil {
 		log.Println("ERROR CHECK FORM FILE:", err)
-		helper.WriteErrorResponse(w, fmt.Errorf("surat (PDF) is required"))
+		helper.WriteErrorResponse(w, fmt.Errorf("surat permohonan (PDF) is required"))
 		return
 	}
 	
@@ -59,7 +59,7 @@ func (h *HandlerImpl) Create(w http.ResponseWriter, r *http.Request) {
 		helper.WriteErrorResponse(w, err)
 		return
 	}
-	suratFileName, err := helper.HandleUploadPdf(w, r, "surat")
+	suratFileName, err := helper.HandleUploadPdf(w, r, "surat_permohonan")
 	if err != nil {
 		log.Println("ERROR UPLOAD SURAT:", err)
 		helper.WriteErrorResponse(w, err)
@@ -107,14 +107,13 @@ func (h *HandlerImpl) Update(w http.ResponseWriter, r *http.Request) {
 		helper.WriteErrorResponse(w, err)
 		return
 	}
-	suratFileName, err := helper.HandleUploadPdf(w, r, "surat")
+	suratFileName, err := helper.HandleUploadPdf(w, r, "surat_permohonan")
 	if err != nil {
 		log.Println("ERROR UPLOAD SURAT:", err)
 		helper.WriteErrorResponse(w, err)
 		return
 	}
 
-	log.Println("FILE NAME:", fotoFileName, suratFileName)
 	request := domain.GangguanJIPMutationRequest{
 		NamaLengkap:       r.FormValue("nama_lengkap"),
 		Jabatan:           r.FormValue("jabatan"),
