@@ -19,14 +19,14 @@ func NewHandler() Handler {
 }
 
 func (h *HandlerImpl) Image(w http.ResponseWriter, r *http.Request) {
-	path := chi.URLParam(r, "*")
-	filePath := filepath.Join("uploads", "img", path)
+	path := chi.URLParam(r, "filename")
 	
+	filePath := filepath.Join("uploads", "img", path)
 	http.ServeFile(w, r, filePath)
 }
 
 func (h *HandlerImpl) Document(w http.ResponseWriter, r *http.Request) {
-	path := chi.URLParam(r, "*")
+	path := chi.URLParam(r, "filename")
 	filePath := filepath.Join("uploads", "docs", path)
 	
 	http.ServeFile(w, r, filePath)
