@@ -90,7 +90,6 @@ func SetupRoutes(r chi.Router, db *sql.DB, config *config.Config) {
 		r.Post("/instansi", instansiHandler.Create)
 		r.Put("/instansi/{id}", instansiHandler.Update)
 		r.Delete("/instansi/{id}", instansiHandler.Delete)
-		r.Get("/instansi", instansiHandler.FindAll)
 		r.Get("/instansi/{id}", instansiHandler.FindById)
 
 		r.Post("/role-pengelola", rolePengelolaHandler.Create)
@@ -112,4 +111,5 @@ func SetupRoutes(r chi.Router, db *sql.DB, config *config.Config) {
 	// Public routes
 	r.Post("/login/user", authHandler.Login)
 	r.Post("/login/pengelola", authHandler.PengelolaLogin)
+	r.Get("/instansi", instansiHandler.FindAll)
 }
