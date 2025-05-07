@@ -6,6 +6,7 @@ import (
 	"log"
 
 	"github.com/farhansaleh/layanan_aptika_be/config"
+	"github.com/farhansaleh/layanan_aptika_be/constants"
 	contextkey "github.com/farhansaleh/layanan_aptika_be/internal/context_key"
 	"github.com/farhansaleh/layanan_aptika_be/internal/domain"
 	"github.com/farhansaleh/layanan_aptika_be/pkg/helper"
@@ -203,8 +204,8 @@ func (s *ServiceImpl) FindById(ctx context.Context, id string) (response domain.
 			InstansiId: result.InstansiId,
 			Status: result.Status,
 			NamaInstansi: result.NamaInstansi,
-			CreatedAt: result.CreatedAt.String(),
-			UpdatedAt: result.UpdatedAt.Time.String(),
+			CreatedAt: result.CreatedAt.Format(constants.TimeLayout),
+			UpdatedAt: result.UpdatedAt.Time.Format(constants.TimeLayout),
 		}
 		return
 	})
@@ -233,7 +234,7 @@ func (s *ServiceImpl) FindAll(ctx context.Context) (response []domain.GangguanJI
 				InstansiId: gangguanJIP.InstansiId,
 				Status: gangguanJIP.Status,
 				NamaInstansi: gangguanJIP.NamaInstansi,
-				CreatedAt: gangguanJIP.CreatedAt.String(),
+				CreatedAt: gangguanJIP.CreatedAt.Format(constants.TimeLayout),
 			})
 		}
 		return
@@ -263,7 +264,7 @@ func (s *ServiceImpl) FindAllByUser(ctx context.Context) (response []domain.Gang
 				InstansiId: gangguanJIP.InstansiId,
 				Status: gangguanJIP.Status,
 				NamaInstansi: gangguanJIP.NamaInstansi,
-				CreatedAt: gangguanJIP.CreatedAt.String(),
+				CreatedAt: gangguanJIP.CreatedAt.Format(constants.TimeLayout),
 			})
 		}
 		return

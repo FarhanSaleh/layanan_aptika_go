@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"log"
 
+	"github.com/farhansaleh/layanan_aptika_be/constants"
 	"github.com/farhansaleh/layanan_aptika_be/internal/domain"
 	"github.com/farhansaleh/layanan_aptika_be/pkg/helper"
 	"github.com/go-playground/validator/v10"
@@ -139,7 +140,7 @@ func (s *ServiceImpl) FindById(ctx context.Context, id string) (response domain.
 			Id: user.Id,
 			Nama: user.Nama,
 			Email: user.Email,
-			CreatedAt: user.CreatedAt.String(),
+			CreatedAt: user.CreatedAt.Format(constants.TimeLayout),
 		}
 		return
 	})
