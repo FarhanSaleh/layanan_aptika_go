@@ -9,6 +9,7 @@ import (
 	"github.com/farhansaleh/layanan_aptika_be/internal/api/instansi"
 	"github.com/farhansaleh/layanan_aptika_be/internal/api/pengelola"
 	perubahanipserver "github.com/farhansaleh/layanan_aptika_be/internal/api/perubahan_ip_server"
+	pusatdatadaerah "github.com/farhansaleh/layanan_aptika_be/internal/api/pusat_data_daerah"
 	rolepengelola "github.com/farhansaleh/layanan_aptika_be/internal/api/role_pengelola"
 	"github.com/farhansaleh/layanan_aptika_be/internal/api/static"
 	"github.com/farhansaleh/layanan_aptika_be/internal/api/users"
@@ -27,6 +28,7 @@ func SetupRoutes(r chi.Router, db *sql.DB, config *config.Config) {
 	pengelolaRepository := pengelola.NewRepository()
 	gangguanJIPRepository := gangguanjip.NewRepository()
 	perubahanIPServerRepository := perubahanipserver.NewRepository()
+	pusatDataDaerahRepository := pusatdatadaerah.NewRepository()
 
 	// Service
 	usersServices := users.NewService(db, usersRepository, validator)
@@ -36,6 +38,7 @@ func SetupRoutes(r chi.Router, db *sql.DB, config *config.Config) {
 	pengelolaService := pengelola.NewService(db, pengelolaRepository, validator)
 	gangguanJIPService := gangguanjip.NewService(db, gangguanJIPRepository, validator, config) 
 	perubahanIPServerService := perubahanipserver.NewService(db, perubahanIPServerRepository, validator, config)
+	pusatDataDaerahService := pusatdatadaerah.NewService(db, pusatDataDaerahRepository, validator, config)
 	
 	// Handler
 	usersHandler := users.NewHandler(usersServices)
@@ -45,6 +48,7 @@ func SetupRoutes(r chi.Router, db *sql.DB, config *config.Config) {
 	pengelolaHandler := pengelola.NewHandler(pengelolaService)
 	gangguanJIPHandler := gangguanjip.NewHandler(gangguanJIPService)
 	perubahanIPServerHandler := perubahanipserver.NewHandler(perubahanIPServerService)
+	pusatDataDaerahHandler := pusatdatadaerah.NewHandler(pusatDataDaerahService)
 	staticHandler := static.NewHandler()
 	
 	// Protected routes user
@@ -65,6 +69,12 @@ func SetupRoutes(r chi.Router, db *sql.DB, config *config.Config) {
 		r.Delete("/perubahan-ip-server/{id}", perubahanIPServerHandler.Delete)
 		r.Get("/perubahan-ip-server/me/{id}", perubahanIPServerHandler.FindById)
 		r.Get("/perubahan-ip-server/me", perubahanIPServerHandler.FindByUser)
+		
+		r.Post("/pusat-data-daerah", pusatDataDaerahHandler.Create)
+		r.Put("/pusat-data-daerah/{id}", pusatDataDaerahHandler.Update)
+		r.Delete("/pusat-data-daerah/{id}", pusatDataDaerahHandler.Delete)
+		r.Get("/pusat-data-daerah/me/{id}", pusatDataDaerahHandler.FindById)
+		r.Get("/pusat-data-daerah/me", pusatDataDaerahHandler.FindByUser)
 
 		r.Delete("/logout", authHandler.Logout)
 	})
@@ -105,6 +115,10 @@ func SetupRoutes(r chi.Router, db *sql.DB, config *config.Config) {
 		r.Get("/perubahan-ip-server/{id}", perubahanIPServerHandler.FindById)
 		r.Patch("/perubahan-ip-server/{id}", perubahanIPServerHandler.UpdateStatus)
 		
+		r.Get("/pusat-data-daerah", pusatDataDaerahHandler.FindAll)
+		r.Get("/pusat-data-daerah/{id}", pusatDataDaerahHandler.FindById)
+		r.Patch("/pusat-data-daerah/{id}", pusatDataDaerahHandler.UpdateStatus)
+
 		r.Put("/change-password/pengelola", authHandler.PengelolaChangePassword)
 	})
 
