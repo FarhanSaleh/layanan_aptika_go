@@ -52,7 +52,8 @@ func (r *RepositoryImpl) Update(ctx context.Context, tx *sql.Tx, perubahanIPServ
 		nomor_hp = ?, 
 		nama_subdomain = ?, 
 		ip_lama = ?, 
-		ip_baru = ?`
+		ip_baru = ?,
+		instansi_id = ?`
 
 	args := []any{
 		perubahanIPServer.NamaLengkap, 
@@ -60,7 +61,8 @@ func (r *RepositoryImpl) Update(ctx context.Context, tx *sql.Tx, perubahanIPServ
 		perubahanIPServer.NomorHP, 
 		perubahanIPServer.NamaSubdomain, 
 		perubahanIPServer.IPLama, 
-		perubahanIPServer.IPBaru, 
+		perubahanIPServer.IPBaru,
+		perubahanIPServer.InstansiId, 
 	}
 
 	if perubahanIPServer.SuratPermohonan != "" {

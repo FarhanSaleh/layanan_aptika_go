@@ -47,13 +47,15 @@ func (r *RepositoryImpl) Update(ctx context.Context, tx *sql.Tx, pusatDataDaerah
 		nama_lengkap = ?, 
 		jabatan = ?, 
 		nomor_hp = ?, 
-		jenis_layanan = ?`
+		jenis_layanan = ?,
+		instansi_id = ?`
 
 	args := []any{
 		pusatDataDaerah.NamaLengkap, 
 		pusatDataDaerah.Jabatan, 
 		pusatDataDaerah.NomorHP, 
-		pusatDataDaerah.JenisLayanan, 
+		pusatDataDaerah.JenisLayanan,
+		pusatDataDaerah.InstansiId, 
 	}
 
 	if pusatDataDaerah.SuratPermohonan != "" {
