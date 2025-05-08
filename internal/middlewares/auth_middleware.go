@@ -39,6 +39,7 @@ func UserAuthMiddleware(next http.Handler) http.Handler {
 
 		tokenClaims := token.Claims.(*domain.JWTClaims)
 		ctx := context.WithValue(r.Context(), contextkey.UserKey, tokenClaims)
+		ctx = context.WithValue(ctx, contextkey.TypeAccountKey, "user")
 		r = r.WithContext(ctx)
 		next.ServeHTTP(w, r)
 	})
@@ -72,6 +73,7 @@ func PengelolaAuthMiddleware(next http.Handler) http.Handler {
 
 		tokenClaims := token.Claims.(*domain.JWTClaims)
 		ctx := context.WithValue(r.Context(), contextkey.PengelolaKey, tokenClaims.Email)
+		ctx = context.WithValue(ctx, contextkey.TypeAccountKey, "pengelola")
 		r = r.WithContext(ctx)
 
 		next.ServeHTTP(w, r)

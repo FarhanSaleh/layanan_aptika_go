@@ -182,14 +182,21 @@ func (s *ServiceImpl) Delete(ctx context.Context, id string) (err error) {
 }
 
 func (s *ServiceImpl) FindById(ctx context.Context, id string) (response domain.PerubahanIPServerDetailResponse, err error) {
+	accountType := ctx.Value(contextkey.TypeAccountKey).(string)
+	
 	err = helper.WithTransaction(s.DB, func(tx *sql.Tx) (err error) {
 		result, err := s.Repository.FindById(ctx, tx, id)
 		if err != nil {
 			log.Println("ERROR REPO <findById>:")
 			return
 		}
+		var suratPermohonanUrl string
 
-		suratPermohonanUrl := s.Config.StaticDocsOriginUser + result.SuratPermohonan
+		if accountType == "pengelola" {
+			suratPermohonanUrl = s.Config.StaticDocsOriginPengelola + result.SuratPermohonan
+		} else {
+			suratPermohonanUrl = s.Config.StaticDocsOriginUser + result.SuratPermohonan
+		}
 
 		response = domain.PerubahanIPServerDetailResponse{
 			Id: result.Id,
@@ -221,7 +228,7 @@ func (s *ServiceImpl) FindAll(ctx context.Context) (response []domain.PerubahanI
 		}
 
 		for _, perubahanIPServer := range result {
-			suratPermohonanUrl := s.Config.StaticDocsOriginUser + perubahanIPServer.SuratPermohonan
+			suratPermohonanUrl := s.Config.StaticDocsOriginPengelola + perubahanIPServer.SuratPermohonan
 
 			response = append(response, domain.PerubahanIPServerResponse{
 				Id: perubahanIPServer.Id,

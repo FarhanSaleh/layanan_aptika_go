@@ -182,15 +182,25 @@ func (s *ServiceImpl) Delete(ctx context.Context, id string) (err error) {
 }
 
 func (s *ServiceImpl) FindById(ctx context.Context, id string) (response domain.GangguanJIPDetailResponse, err error) {
+	accountType := ctx.Value(contextkey.TypeAccountKey).(string)
+	
 	err = helper.WithTransaction(s.DB, func(tx *sql.Tx) (err error) {
 		result, err := s.Repository.FindById(ctx, tx, id)
 		if err != nil {
 			log.Println("ERROR REPO <findById>:")
 			return
 		}
+		
+		var suratPermohonanUrl string
+		var fotoUrl string
 
-		suratPermohonanUrl := s.Config.StaticDocsOriginUser + result.SuratPermohonan
-		fotoUrl := s.Config.StaticImgOriginUser + result.Foto
+		if accountType == "pengelola" {
+			suratPermohonanUrl = s.Config.StaticDocsOriginPengelola + result.SuratPermohonan
+			fotoUrl = s.Config.StaticImgOriginPengelola + result.Foto
+		} else {
+			suratPermohonanUrl = s.Config.StaticDocsOriginUser + result.SuratPermohonan
+			fotoUrl = s.Config.StaticImgOriginUser + result.Foto
+		}
 
 		response = domain.GangguanJIPDetailResponse{
 			Id: result.Id,
@@ -222,7 +232,7 @@ func (s *ServiceImpl) FindAll(ctx context.Context) (response []domain.GangguanJI
 		}
 
 		for _, gangguanJIP := range result {
-			suratPermohonanUrl := s.Config.StaticDocsOriginUser + gangguanJIP.SuratPermohonan
+			suratPermohonanUrl := s.Config.StaticDocsOriginPengelola + gangguanJIP.SuratPermohonan
 
 			response = append(response, domain.GangguanJIPResponse{
 				Id: gangguanJIP.Id,
