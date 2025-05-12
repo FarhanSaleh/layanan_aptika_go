@@ -8,6 +8,7 @@ import (
 	gangguanjip "github.com/farhansaleh/layanan_aptika_be/internal/api/gangguan-jip"
 	"github.com/farhansaleh/layanan_aptika_be/internal/api/instansi"
 	pembangunanaplikasi "github.com/farhansaleh/layanan_aptika_be/internal/api/pembangunan_aplikasi"
+	pembuatansubdomain "github.com/farhansaleh/layanan_aptika_be/internal/api/pembuatan_subdomain"
 	"github.com/farhansaleh/layanan_aptika_be/internal/api/pengelola"
 	perubahanipserver "github.com/farhansaleh/layanan_aptika_be/internal/api/perubahan_ip_server"
 	pusatdatadaerah "github.com/farhansaleh/layanan_aptika_be/internal/api/pusat_data_daerah"
@@ -31,6 +32,7 @@ func SetupRoutes(r chi.Router, db *sql.DB, config *config.Config) {
 	perubahanIPServerRepository := perubahanipserver.NewRepository()
 	pusatDataDaerahRepository := pusatdatadaerah.NewRepository()
 	pembangunanaplikasiRepository := pembangunanaplikasi.NewRepository()
+	pembuatanSubdomainRepository := pembuatansubdomain.NewRepository()
 
 	// Service
 	usersServices := users.NewService(db, usersRepository, validator)
@@ -42,6 +44,7 @@ func SetupRoutes(r chi.Router, db *sql.DB, config *config.Config) {
 	perubahanIPServerService := perubahanipserver.NewService(db, perubahanIPServerRepository, validator, config)
 	pusatDataDaerahService := pusatdatadaerah.NewService(db, pusatDataDaerahRepository, validator, config)
 	pembanguananAplikasiService := pembangunanaplikasi.NewService(db, pembangunanaplikasiRepository, validator, config)
+	pembuatanSubdomainService := pembuatansubdomain.NewService(db, pembuatanSubdomainRepository, validator, config)
 	
 	// Handler
 	usersHandler := users.NewHandler(usersServices)
@@ -53,6 +56,7 @@ func SetupRoutes(r chi.Router, db *sql.DB, config *config.Config) {
 	perubahanIPServerHandler := perubahanipserver.NewHandler(perubahanIPServerService)
 	pusatDataDaerahHandler := pusatdatadaerah.NewHandler(pusatDataDaerahService)
 	pembangunanAplikasiHandler := pembangunanaplikasi.NewHandler(pembanguananAplikasiService)
+	pembuatanSubdomainHandler := pembuatansubdomain.NewHandler(pembuatanSubdomainService)
 	staticHandler := static.NewHandler()
 	
 	// Protected routes user
@@ -85,6 +89,12 @@ func SetupRoutes(r chi.Router, db *sql.DB, config *config.Config) {
 		r.Delete("/pembangunan-aplikasi/{id}", pembangunanAplikasiHandler.Delete)
 		r.Get("/pembangunan-aplikasi/me/{id}", pembangunanAplikasiHandler.FindById)
 		r.Get("/pembangunan-aplikasi/me", pembangunanAplikasiHandler.FindByUser)
+		
+		r.Post("/pembuatan-subdomain", pembuatanSubdomainHandler.Create)
+		r.Put("/pembuatan-subdomain/{id}", pembuatanSubdomainHandler.Update)
+		r.Delete("/pembuatan-subdomain/{id}", pembuatanSubdomainHandler.Delete)
+		r.Get("/pembuatan-subdomain/me/{id}", pembuatanSubdomainHandler.FindById)
+		r.Get("/pembuatan-subdomain/me", pembuatanSubdomainHandler.FindByUser)
 
 		r.Delete("/logout", authHandler.Logout)
 	})
@@ -132,6 +142,10 @@ func SetupRoutes(r chi.Router, db *sql.DB, config *config.Config) {
 		r.Get("/pembangunan-aplikasi", pembangunanAplikasiHandler.FindAll)
 		r.Get("/pembangunan-aplikasi/{id}", pembangunanAplikasiHandler.FindById)
 		r.Patch("/pembangunan-aplikasi/{id}", pembangunanAplikasiHandler.UpdateStatus)
+		
+		r.Get("/pembuatan-subdomain", pembuatanSubdomainHandler.FindAll)
+		r.Get("/pembuatan-subdomain/{id}", pembuatanSubdomainHandler.FindById)
+		r.Patch("/pembuatan-subdomain/{id}", pembuatanSubdomainHandler.UpdateStatus)
 
 		r.Put("/change-password/pengelola", authHandler.PengelolaChangePassword)
 	})
