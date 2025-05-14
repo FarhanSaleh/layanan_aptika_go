@@ -8,6 +8,7 @@ import (
 	gangguanjip "github.com/farhansaleh/layanan_aptika_be/internal/api/gangguan-jip"
 	"github.com/farhansaleh/layanan_aptika_be/internal/api/instansi"
 	pembangunanaplikasi "github.com/farhansaleh/layanan_aptika_be/internal/api/pembangunan_aplikasi"
+	pembuatanemail "github.com/farhansaleh/layanan_aptika_be/internal/api/pembuatan_email"
 	pembuatansubdomain "github.com/farhansaleh/layanan_aptika_be/internal/api/pembuatan_subdomain"
 	"github.com/farhansaleh/layanan_aptika_be/internal/api/pengelola"
 	perubahanipserver "github.com/farhansaleh/layanan_aptika_be/internal/api/perubahan_ip_server"
@@ -33,6 +34,7 @@ func SetupRoutes(r chi.Router, db *sql.DB, config *config.Config) {
 	pusatDataDaerahRepository := pusatdatadaerah.NewRepository()
 	pembangunanaplikasiRepository := pembangunanaplikasi.NewRepository()
 	pembuatanSubdomainRepository := pembuatansubdomain.NewRepository()
+	pembuatanEmailRepository := pembuatanemail.NewRepository()
 
 	// Service
 	usersServices := users.NewService(db, usersRepository, validator)
@@ -45,6 +47,7 @@ func SetupRoutes(r chi.Router, db *sql.DB, config *config.Config) {
 	pusatDataDaerahService := pusatdatadaerah.NewService(db, pusatDataDaerahRepository, validator, config)
 	pembanguananAplikasiService := pembangunanaplikasi.NewService(db, pembangunanaplikasiRepository, validator, config)
 	pembuatanSubdomainService := pembuatansubdomain.NewService(db, pembuatanSubdomainRepository, validator, config)
+	pembuatanEmailService := pembuatanemail.NewService(db, pembuatanEmailRepository, validator, config)
 	
 	// Handler
 	usersHandler := users.NewHandler(usersServices)
@@ -57,6 +60,7 @@ func SetupRoutes(r chi.Router, db *sql.DB, config *config.Config) {
 	pusatDataDaerahHandler := pusatdatadaerah.NewHandler(pusatDataDaerahService)
 	pembangunanAplikasiHandler := pembangunanaplikasi.NewHandler(pembanguananAplikasiService)
 	pembuatanSubdomainHandler := pembuatansubdomain.NewHandler(pembuatanSubdomainService)
+	pembuatanEmailHandler := pembuatanemail.NewHandler(pembuatanEmailService)
 	staticHandler := static.NewHandler()
 	
 	// Protected routes user
@@ -95,6 +99,12 @@ func SetupRoutes(r chi.Router, db *sql.DB, config *config.Config) {
 		r.Delete("/pembuatan-subdomain/{id}", pembuatanSubdomainHandler.Delete)
 		r.Get("/pembuatan-subdomain/me/{id}", pembuatanSubdomainHandler.FindById)
 		r.Get("/pembuatan-subdomain/me", pembuatanSubdomainHandler.FindByUser)
+		
+		r.Post("/pembuatan-email", pembuatanEmailHandler.Create)
+		r.Put("/pembuatan-email/{id}", pembuatanEmailHandler.Update)
+		r.Delete("/pembuatan-email/{id}", pembuatanEmailHandler.Delete)
+		r.Get("/pembuatan-email/me/{id}", pembuatanEmailHandler.FindById)
+		r.Get("/pembuatan-email/me", pembuatanEmailHandler.FindByUser)
 
 		r.Delete("/logout", authHandler.Logout)
 	})
@@ -146,6 +156,10 @@ func SetupRoutes(r chi.Router, db *sql.DB, config *config.Config) {
 		r.Get("/pembuatan-subdomain", pembuatanSubdomainHandler.FindAll)
 		r.Get("/pembuatan-subdomain/{id}", pembuatanSubdomainHandler.FindById)
 		r.Patch("/pembuatan-subdomain/{id}", pembuatanSubdomainHandler.UpdateStatus)
+		
+		r.Get("/pembuatan-email", pembuatanEmailHandler.FindAll)
+		r.Get("/pembuatan-email/{id}", pembuatanEmailHandler.FindById)
+		r.Patch("/pembuatan-email/{id}", pembuatanEmailHandler.UpdateStatus)
 
 		r.Put("/change-password/pengelola", authHandler.PengelolaChangePassword)
 	})
