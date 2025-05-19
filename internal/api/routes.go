@@ -11,6 +11,7 @@ import (
 	pembuatanemail "github.com/farhansaleh/layanan_aptika_be/internal/api/pembuatan_email"
 	pembuatansubdomain "github.com/farhansaleh/layanan_aptika_be/internal/api/pembuatan_subdomain"
 	"github.com/farhansaleh/layanan_aptika_be/internal/api/pengelola"
+	"github.com/farhansaleh/layanan_aptika_be/internal/api/permintaan"
 	perubahanipserver "github.com/farhansaleh/layanan_aptika_be/internal/api/perubahan_ip_server"
 	pusatdatadaerah "github.com/farhansaleh/layanan_aptika_be/internal/api/pusat_data_daerah"
 	rolepengelola "github.com/farhansaleh/layanan_aptika_be/internal/api/role_pengelola"
@@ -35,6 +36,7 @@ func SetupRoutes(r chi.Router, db *sql.DB, config *config.Config) {
 	pembangunanaplikasiRepository := pembangunanaplikasi.NewRepository()
 	pembuatanSubdomainRepository := pembuatansubdomain.NewRepository()
 	pembuatanEmailRepository := pembuatanemail.NewRepository()
+	permintaanRepository := permintaan.NewRepository()
 
 	// Service
 	usersServices := users.NewService(db, usersRepository, validator)
@@ -48,6 +50,7 @@ func SetupRoutes(r chi.Router, db *sql.DB, config *config.Config) {
 	pembanguananAplikasiService := pembangunanaplikasi.NewService(db, pembangunanaplikasiRepository, validator, config)
 	pembuatanSubdomainService := pembuatansubdomain.NewService(db, pembuatanSubdomainRepository, validator, config)
 	pembuatanEmailService := pembuatanemail.NewService(db, pembuatanEmailRepository, validator, config)
+	permintaanService := permintaan.NewService(db, config, permintaanRepository)
 	
 	// Handler
 	usersHandler := users.NewHandler(usersServices)
@@ -61,6 +64,7 @@ func SetupRoutes(r chi.Router, db *sql.DB, config *config.Config) {
 	pembangunanAplikasiHandler := pembangunanaplikasi.NewHandler(pembanguananAplikasiService)
 	pembuatanSubdomainHandler := pembuatansubdomain.NewHandler(pembuatanSubdomainService)
 	pembuatanEmailHandler := pembuatanemail.NewHandler(pembuatanEmailService)
+	permintaanHandler := permintaan.NewHandler(permintaanService)
 	staticHandler := static.NewHandler()
 	
 	// Protected routes user
@@ -105,6 +109,14 @@ func SetupRoutes(r chi.Router, db *sql.DB, config *config.Config) {
 		r.Delete("/pembuatan-email/{id}", pembuatanEmailHandler.Delete)
 		r.Get("/pembuatan-email/me/{id}", pembuatanEmailHandler.FindById)
 		r.Get("/pembuatan-email/me", pembuatanEmailHandler.FindByUser)
+
+		r.Get("/permintaan/me", permintaanHandler.CountAll)
+		r.Get("/permintaan/gangguan-jip/me", permintaanHandler.CountGangguanJIP)
+		r.Get("/permintaan/pembangunan-aplikasi/me", permintaanHandler.CountPembangunanAplikasi)
+		r.Get("/permintaan/pembuatan-email/me", permintaanHandler.CountPembuatanEmail)
+		r.Get("/permintaan/pembuatan-subdomain/me", permintaanHandler.CountPembuatanSubdomain)
+		r.Get("/permintaan/perubahan-ip-server/me", permintaanHandler.CountPerubahanIPServer)
+		r.Get("/permintaan/pusat-data-daerah/me", permintaanHandler.CountPusatDataDaerah)
 
 		r.Delete("/logout", authHandler.Logout)
 	})
@@ -160,6 +172,14 @@ func SetupRoutes(r chi.Router, db *sql.DB, config *config.Config) {
 		r.Get("/pembuatan-email", pembuatanEmailHandler.FindAll)
 		r.Get("/pembuatan-email/{id}", pembuatanEmailHandler.FindById)
 		r.Patch("/pembuatan-email/{id}", pembuatanEmailHandler.UpdateStatus)
+
+		r.Get("/permintaan", permintaanHandler.CountAll)
+		r.Get("/permintaan/gangguan-jip", permintaanHandler.CountGangguanJIP)
+		r.Get("/permintaan/pembangunan-aplikasi", permintaanHandler.CountPembangunanAplikasi)
+		r.Get("/permintaan/pembuatan-email", permintaanHandler.CountPembuatanEmail)
+		r.Get("/permintaan/pembuatan-subdomain", permintaanHandler.CountPembuatanSubdomain)
+		r.Get("/permintaan/perubahan-ip-server", permintaanHandler.CountPerubahanIPServer)
+		r.Get("/permintaan/pusat-data-daerah", permintaanHandler.CountPusatDataDaerah)
 
 		r.Put("/change-password/pengelola", authHandler.PengelolaChangePassword)
 	})
