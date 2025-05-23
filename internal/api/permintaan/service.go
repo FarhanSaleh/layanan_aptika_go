@@ -13,6 +13,7 @@ import (
 
 type Service interface {
 	CountAll(ctx context.Context) (domain.PermintaanCountResponse, error)
+	CountAllPerMonth(ctx context.Context, year string) ([]domain.PermintaanCountResponse, error)
 	CountGangguanJIP(ctx context.Context) (domain.PermintaanCountResponse, error)
 	CountPembuatanEmail(ctx context.Context) (domain.PermintaanCountResponse, error)
 	CountPembuatanSubdomain(ctx context.Context) (domain.PermintaanCountResponse, error)
@@ -51,6 +52,19 @@ func (s *ServiceImpl) CountAll(ctx context.Context) (response domain.PermintaanC
 
 		if err != nil {
 			log.Println("ERROR REPO <countAll>:")
+			return
+		}
+		return
+	})
+	return
+}
+
+func (s *ServiceImpl) CountAllPerMonth(ctx context.Context, year string) (response []domain.PermintaanCountResponse, err error) {
+	err = helper.WithTransaction(s.DB, func(tx *sql.Tx) (err error) {
+		response, err = s.Repository.CountAllPerMonth(ctx, tx, year)
+
+		if err != nil {
+			log.Println("ERROR REPO <countAllPerMonth>:")
 			return
 		}
 		return

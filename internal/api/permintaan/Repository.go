@@ -3,12 +3,16 @@ package permintaan
 import (
 	"context"
 	"database/sql"
+	"fmt"
+	"log"
+	"time"
 
 	"github.com/farhansaleh/layanan_aptika_be/internal/domain"
 )
 
 type Repository interface {
 	CountAll(ctx context.Context, tx *sql.Tx) (domain.PermintaanCountResponse, error)
+	CountAllPerMonth(ctx context.Context, tx *sql.Tx, year string) ([]domain.PermintaanCountResponse, error)
 	CountGangguanJIP(ctx context.Context, tx *sql.Tx) (domain.PermintaanCountResponse, error)
 	CountPembuatanEmail(ctx context.Context, tx *sql.Tx) (domain.PermintaanCountResponse, error)
 	CountPembuatanSubdomain(ctx context.Context, tx *sql.Tx) (domain.PermintaanCountResponse, error)
@@ -50,6 +54,75 @@ func (r *RepositoryImpl) CountAll(ctx context.Context, tx *sql.Tx) (result domai
 			SELECT status FROM pusat_data_daerah
 			) AS gabungan;`
 	err = tx.QueryRowContext(ctx, SQL).Scan(&result.Total, &result.Diproses, &result.Disetujui, &result.Ditolak)
+	return
+}
+
+func (r *RepositoryImpl) CountAllPerMonth(ctx context.Context, tx *sql.Tx, year string) (result []domain.PermintaanCountResponse, err error) {
+	if year == "" {
+		year = time.Now().Format("2006")
+	}
+
+	var bulanTahunCTE string
+	for i := 1; i <= 12; i++ {
+		month := fmt.Sprintf("%02d", i)
+		if i == 1 {
+			bulanTahunCTE += fmt.Sprintf("SELECT '%s-%s' AS bulan", year, month)
+			}else {
+			bulanTahunCTE += fmt.Sprintf(" UNION ALL SELECT '%s-%s'", year, month)
+
+		}
+	}
+	SQL := fmt.Sprintf(`
+			WITH bulan_tahun AS (
+				%s
+			),
+			data_pengaduan AS (
+				SELECT
+				DATE_FORMAT(created_at, '%%Y-%%m') AS bulan,
+				COUNT(*) AS total,
+				COALESCE(SUM(CASE WHEN status = 'diproses' THEN 1 ELSE 0 END), 0) AS diproses,
+				COALESCE(SUM(CASE WHEN status = 'disetujui' THEN 1 ELSE 0 END), 0) AS disetujui,
+				COALESCE(SUM(CASE WHEN status = 'ditolak' THEN 1 ELSE 0 END), 0) AS ditolak
+				FROM (
+					SELECT status, created_at FROM pengaduan_gangguan_jip
+					UNION ALL
+					SELECT status, created_at FROM pembuatan_email
+					UNION ALL
+					SELECT status, created_at FROM pembuatan_subdomain
+					UNION ALL
+					SELECT status, created_at FROM pembangunan_aplikasi
+					UNION ALL
+					SELECT status, created_at FROM perubahan_ip_server
+					UNION ALL
+					SELECT status, created_at FROM pusat_data_daerah
+				) AS gabungan
+				GROUP BY DATE_FORMAT(created_at, '%%Y-%%m')
+			)
+			SELECT
+			bt.bulan,
+			COALESCE(dp.total, 0) AS total,
+			COALESCE(dp.diproses, 0) AS diproses,
+			COALESCE(dp.disetujui, 0) AS disetujui,
+			COALESCE(dp.ditolak, 0) AS ditolak
+			FROM bulan_tahun bt
+			LEFT JOIN data_pengaduan dp ON bt.bulan = dp.bulan
+			ORDER BY bt.bulan;`, bulanTahunCTE)
+	rows, err := tx.QueryContext(ctx, SQL)
+	if err != nil {
+		log.Println("ERROR QUERY: ", err)
+		return
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var u domain.PermintaanCountResponse
+		err = rows.Scan(&u.Bulan, &u.Total, &u.Diproses, &u.Disetujui, &u.Ditolak)
+		if err != nil {
+			log.Println("ERROR SCANNING: ", err)
+			return
+		}
+		result = append(result, u)
+	}
 	return
 }
 

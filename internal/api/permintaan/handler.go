@@ -28,12 +28,28 @@ func NewHandler(service Service) Handler {
 }
 
 func (h *HandlerImpl) CountAll(w http.ResponseWriter, r *http.Request) {
-	result, err := h.Service.CountAll(r.Context())
-	if err != nil {
-		log.Println("ERROR SERVICE:", err)
-		helper.WriteErrorResponse(w, err)
-		return
+	groupBy := r.URL.Query().Get("group_by")
+	year := r.URL.Query().Get("year")
+
+	var result any
+	var err error
+
+	if(groupBy == "bulan") {
+		result, err = h.Service.CountAllPerMonth(r.Context(), year)
+		if err != nil {
+			log.Println("ERROR SERVICE:", err)
+			helper.WriteErrorResponse(w, err)
+			return
+		}
+	}else{
+		result, err = h.Service.CountAll(r.Context())
+		if err != nil {
+			log.Println("ERROR SERVICE:", err)
+			helper.WriteErrorResponse(w, err)
+			return
+		}
 	}
+
 	helper.WriteResponseBody(w, http.StatusOK, domain.DefaultResponse{
 		Message: constants.SuccessGetData,
 		Data:    result,
