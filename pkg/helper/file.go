@@ -3,6 +3,7 @@ package helper
 import (
 	"fmt"
 	"io"
+	"log"
 	"mime/multipart"
 	"net/http"
 	"os"
@@ -114,5 +115,21 @@ func CheckFormFile(r *http.Request, fieldName string) error {
 		return err
 	}
 	defer file.Close()
+	return nil
+}
+
+func DeleteFile(filename string, subDirectory string) error {
+	uploadDir := "uploads" 
+	filePath := filepath.Join(uploadDir, subDirectory, filename)
+
+	err := os.Remove(filePath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			log.Printf("File not found: %s", filePath)
+			return nil
+		}
+		return fmt.Errorf("failed to delete file %s: %w", filePath, err)
+	}
+	log.Printf("Successfully deleted file: %s", filePath)
 	return nil
 }

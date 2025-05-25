@@ -172,6 +172,20 @@ func (s *ServiceImpl) Delete(ctx context.Context, id string) (err error) {
 			log.Println("ERROR REPO <delete>:")
 			return
 		}
+		
+		if result.BerkasSK != "" {
+			err = helper.DeleteFile(result.BerkasSK, "docs")
+			if err != nil {
+				log.Println("ERROR DELETING BERKAS SK:", err)
+			}
+		}
+
+		if result.SuratPermohonan != "" {
+			err = helper.DeleteFile(result.SuratPermohonan, "docs")
+			if err != nil {
+				log.Println("ERROR DELETING SURAT PERMOHONAN:", err)
+			}
+		}
 		return
 	})
 	return
