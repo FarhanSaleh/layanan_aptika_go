@@ -24,8 +24,8 @@ func WithTransaction(db *sql.DB, fn func(tx *sql.Tx) error) (err error) {
 		return
 	}
 	defer func ()  {
-		log.Println("DEFER ERR: ", err)
 		if err != nil {
+			log.Println("DEFER ERR: ", err)
 			if errRollback := tx.Rollback(); errRollback != nil {
 				log.Println("ERROR ROLLBACK: ", errRollback)
 			}
