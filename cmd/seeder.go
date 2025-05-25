@@ -48,7 +48,7 @@ var runAllSeederCmd = &cobra.Command{
 		}
 		defer conn.Close()
 
-		files, _ := filepath.Glob("seeders/*.sql")
+		files, _ := filepath.Glob("database/seeders/*.sql")
 		for _, file := range files {
 			content, _ := os.ReadFile(file)
 			if _, err := conn.ExecContext(context.Background(), string(content)); err != nil {
@@ -73,7 +73,7 @@ var runSeederCmd = &cobra.Command{
 		}
 		defer conn.Close()
 
-		file := fmt.Sprintf("seeders/%s.sql", strings.ToLower(args[0]))
+		file := fmt.Sprintf("database/seeders/%s.sql", strings.ToLower(args[0]))
 		content, err := os.ReadFile(file)
 		if err != nil {
 			fmt.Println("Error reading seeder file:", err)
