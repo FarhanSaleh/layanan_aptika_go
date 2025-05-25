@@ -102,7 +102,7 @@ func (r *RepositoryImpl) FindByEmail(ctx context.Context, tx *sql.Tx, email stri
 			p.role_id, 
 			r.nama as nama_role 
 			FROM pengelola as p 
-			LEFT JOIN role_pengelola as r ON p.role_id 
+			LEFT JOIN role_pengelola as r ON p.role_id = r.id
 			WHERE email = ?`
 	err = tx.QueryRowContext(ctx, SQL, email).Scan(&result.Id, &result.Nama, &result.Email, &result.Password, &result.RoleId, &result.NamaRole)
 	return
