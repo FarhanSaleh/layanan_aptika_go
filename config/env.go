@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 )
 
@@ -27,9 +28,9 @@ func InitEnvs() Config {
 		JWTSecret: os.Getenv("JWT_SECRET"),
 		JWTPengelolaSecret: os.Getenv("JWT_PENGELOLA_SECRET"),
 		AllowedOrigins: []string{os.Getenv("DEV_ORIGIN"), os.Getenv("PROD_ORIGIN")},
-		StaticDocsOriginUser: os.Getenv("STATIC_DOCS_ORIGIN_USER"),
-		StaticImgOriginUser: os.Getenv("STATIC_IMG_ORIGIN_USER"),
-		StaticDocsOriginPengelola: os.Getenv("STATIC_DOCS_ORIGIN_PENGELOLA"),
-		StaticImgOriginPengelola: os.Getenv("STATIC_IMG_ORIGIN_PENGELOLA"),
+		StaticDocsOriginUser: fmt.Sprintf("%s%s/%s", os.Getenv("HOST_ORIGIN"), os.Getenv("PORT"), os.Getenv("STATIC_DOCS_ORIGIN_USER")),
+		StaticImgOriginUser: fmt.Sprintf("%s%s/%s", os.Getenv("HOST_ORIGIN"), os.Getenv("PORT"), os.Getenv("STATIC_IMG_ORIGIN_USER")),
+		StaticDocsOriginPengelola: fmt.Sprintf("%s%s/%s", os.Getenv("HOST_ORIGIN"), os.Getenv("PORT"), os.Getenv("STATIC_DOCS_ORIGIN_PENGELOLA")),
+		StaticImgOriginPengelola: fmt.Sprintf("%s%s/%s", os.Getenv("HOST_ORIGIN"), os.Getenv("PORT"), os.Getenv("STATIC_IMG_ORIGIN_PENGELOLA")),
 	}
 }
