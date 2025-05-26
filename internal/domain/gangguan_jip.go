@@ -68,7 +68,7 @@ type GangguanJIPMutationResponse struct {
 type GangguanJIPMutationRequest struct {
 	NamaLengkap       string `validate:"required,ascii,max=255,min=3"`
 	Jabatan           string `validate:"required,ascii,max=255,min=3"`
-	NomorHP           string `validate:"required,ascii,max=255,min=3"`
+	NomorHP           string `validate:"required,numeric,max=255,min=3"`
 	LokasiGangguan    string `validate:"required,ascii"`
 	DeskripsiGangguan string `validate:"required,ascii"`
 	SuratPermohonan   string 

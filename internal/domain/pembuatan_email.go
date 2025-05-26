@@ -65,9 +65,9 @@ type PembuatanEmailMutationResponse struct {
 
 type PembuatanEmailMutationRequest struct {
 	NamaLengkap       string `validate:"required,ascii,max=255,min=3"`
-	NIP               string `validate:"required,numeric,max=255,min=3"`
+	NIP               string `validate:"required,numeric,max=18,min=18"`
 	Jabatan           string `validate:"required,ascii,max=255,min=3"`
-	NomorHP           string `validate:"required,ascii,max=255,min=3"`
+	NomorHP           string `validate:"required,numeric,max=15,min=3"`
 	BerkasSK          string 
 	SuratPermohonan   string 
 	InstansiId        string `validate:"required,uuid"`

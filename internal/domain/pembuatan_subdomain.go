@@ -69,7 +69,7 @@ type PembuatanSubdomainMutationResponse struct {
 type PembuatanSubdomainMutationRequest struct {
 	NamaLengkap       string `validate:"required,ascii,max=255,min=3"`
 	Jabatan           string `validate:"required,ascii,max=255,min=3"`
-	NomorHP           string `validate:"required,ascii,max=255,min=3"`
+	NomorHP           string `validate:"required,numeric,max=15,min=3"`
 	NamaSubdomain     string `validate:"required,ascii"`
 	IPPublik          string `validate:"required,ip"`
 	Deskripsi         string `validate:"required,ascii"`

@@ -62,7 +62,7 @@ type PusatDataDaerahMutationResponse struct {
 type PusatDataDaerahMutationRequest struct {
 	NamaLengkap       string `validate:"required,ascii,max=255,min=3"`
 	Jabatan           string `validate:"required,ascii,max=255,min=3"`
-	NomorHP           string `validate:"required,ascii,max=255,min=3"`
+	NomorHP           string `validate:"required,numeric,max=15,min=3"`
 	JenisLayanan      string `validate:"required,ascii"`
 	SuratPermohonan   string 
 	InstansiId        string `validate:"required,uuid"`

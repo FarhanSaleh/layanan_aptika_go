@@ -67,7 +67,7 @@ type PembangunanAplikasiMutationResponse struct {
 
 type PembangunanAplikasiMutationRequest struct {
 	NamaPimpinan      string `validate:"required,ascii,max=255,min=3"`
-	NomorHP           string `validate:"required,ascii,max=255,min=3"`
+	NomorHP           string `validate:"required,numeric,max=15,min=3"`
 	EmailDinas        string `validate:"required,email,max=255,min=3"`
 	RiwayatPimpinan   string `validate:"required,ascii"`
 	JenisAplikasi     string `validate:"required,ascii"`
