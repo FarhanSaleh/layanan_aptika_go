@@ -138,7 +138,8 @@ func (r *RepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) (result []doma
 			i.nama as nama_instansi,
 			pe.created_at 
 			FROM pembuatan_email as pe
-			LEFT JOIN instansi as i ON pe.instansi_id = i.id`
+			LEFT JOIN instansi as i ON pe.instansi_id = i.id
+			ORDER BY pe.created_at DESC`
 	rows, err := tx.QueryContext(ctx, SQL)
 	if err != nil {
 		log.Println("ERROR QUERY: ", err)
@@ -190,7 +191,7 @@ func (r *RepositoryImpl) FindAllByUser(ctx context.Context, tx *sql.Tx, userId s
 			pe.created_at 
 			FROM pembuatan_email as pe
 			LEFT JOIN instansi as i ON pe.instansi_id = i.id
-			WHERE pe.user_id = ?`
+			WHERE pe.user_id = ? ORDER BY pe.created_at DESC`
 	rows, err := tx.QueryContext(ctx, SQL, userId)
 	if err != nil {
 		log.Println("ERROR QUERY: ", err)
