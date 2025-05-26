@@ -43,13 +43,13 @@ func (h *HandlerImpl) Create(w http.ResponseWriter, r *http.Request) {
 	err = helper.CheckFormFile(r, "surat_permohonan")
 	if err != nil {
 		log.Println("ERROR CHECK FORM FILE:", err)
-		helper.WriteErrorResponse(w, fmt.Errorf("surat permohonan (PDF) is required"))
+		helper.WriteErrorResponse(w, fmt.Errorf("surat permohonan (PDF) wajib diisi"))
 		return
 	}
 	err = helper.CheckFormFile(r, "berkas_sk")
 	if err != nil {
 		log.Println("ERROR CHECK FORM FILE:", err)
-		helper.WriteErrorResponse(w, fmt.Errorf("berkas sk (PDF) is required"))
+		helper.WriteErrorResponse(w, fmt.Errorf("berkas sk (PDF) wajib diisi"))
 		return
 	}
 	
