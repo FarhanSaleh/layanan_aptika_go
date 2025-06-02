@@ -14,6 +14,7 @@ type User struct {
 	IsDeleted    bool
 	CreatedAt    time.Time
 	UpdatedAt    sql.NullTime
+	NotificationToken sql.NullString
 }
 
 type UserResponse struct {

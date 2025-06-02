@@ -16,6 +16,7 @@ type Repository interface {
 	FindAll(ctx context.Context, tx *sql.Tx) ([]domain.User, error)
 	FindByEmail(ctx context.Context, tx *sql.Tx, email string) (domain.User, error)
 	UpdatePassword(ctx context.Context, tx *sql.Tx, user *domain.User) error
+	UpdateNotificationToken(ctx context.Context, tx *sql.Tx, user *domain.User) error
 }
 
 type RepositoryImpl struct{}
@@ -76,13 +77,19 @@ func (r *RepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) (result []doma
 }
 
 func (r *RepositoryImpl) FindByEmail(ctx context.Context, tx *sql.Tx, email string) (result domain.User, err error) {
-	SQL := `SELECT id, nama, email, password FROM users WHERE email = ?`
-	err = tx.QueryRowContext(ctx, SQL, email).Scan(&result.Id, &result.Nama, &result.Email, &result.Password)
+	SQL := `SELECT id, nama, email, password, notification_token FROM users WHERE email = ?`
+	err = tx.QueryRowContext(ctx, SQL, email).Scan(&result.Id, &result.Nama, &result.Email, &result.Password, &result.NotificationToken)
 	return
 }
 
 func (r *RepositoryImpl) UpdatePassword(ctx context.Context, tx *sql.Tx, user *domain.User) (err error) {
 	SQL := `UPDATE users SET password = ? WHERE email = ?`
 	_, err = tx.ExecContext(ctx, SQL, user.Password, user.Email)
+	return
+}
+
+func (r *RepositoryImpl) UpdateNotificationToken(ctx context.Context, tx *sql.Tx, user *domain.User) (err error) {
+	SQL := `UPDATE users SET notification_token = ? WHERE email = ?`
+	_, err = tx.ExecContext(ctx, SQL, user.NotificationToken, user.Email)
 	return
 }

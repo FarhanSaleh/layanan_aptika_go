@@ -53,6 +53,18 @@ func (s *ServiceImpl) Login(ctx context.Context, request domain.LoginRequest) (r
 			err = helper.NewAuthError("email atau password salah")
 			return
 		}
+		if !user.NotificationToken.Valid {
+			err = user.NotificationToken.Scan(request.NotificationToken)
+			if err != nil {
+				log.Println("ERROR SCAN NOTIFICATION TOKEN", err)
+				return
+			}
+			err = s.UserRepository.UpdateNotificationToken(ctx, tx, &user)
+			if err != nil {
+				log.Println("ERROR REPO<updateNotificationToken>", err)
+				return
+			}
+		}
 		
 		err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(request.Password))
 		if err != nil {
@@ -103,6 +115,7 @@ func (s *ServiceImpl) PengelolaLogin(ctx context.Context, request domain.LoginRe
 			return
 		}
 		response.AccessToken = token
+		response.RoleId = pengelola.RoleId
 		return
 	})
 	
