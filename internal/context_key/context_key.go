@@ -6,4 +6,5 @@ const (
 	PengelolaKey   ContextKey = "pengelola"
 	UserKey        ContextKey = "user"
 	TypeAccountKey ContextKey = "type_account"
+	RoleKey        ContextKey = "role"
 )

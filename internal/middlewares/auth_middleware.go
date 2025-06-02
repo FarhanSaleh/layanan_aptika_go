@@ -18,7 +18,7 @@ func UserAuthMiddleware(next http.Handler) http.Handler {
 		authHeader := r.Header.Get("Authorization")
 		if authHeader == "" || len(authHeader) < 8 || authHeader[:7] != "Bearer " {
 			helper.WriteResponseBody(w, http.StatusUnauthorized, domain.DefaultResponse{
-				Message: "Token tidak ditemukan",
+				Message: "Unauthorized",
 			})
             return
         }
@@ -32,7 +32,7 @@ func UserAuthMiddleware(next http.Handler) http.Handler {
 		
         if err != nil || !token.Valid {
             helper.WriteResponseBody(w, http.StatusUnauthorized, domain.DefaultResponse{
-				Message: "Token tidak valid",
+				Message: "Unauthorized",
 			})
             return
         }
@@ -40,6 +40,7 @@ func UserAuthMiddleware(next http.Handler) http.Handler {
 		tokenClaims := token.Claims.(*domain.JWTClaims)
 		ctx := context.WithValue(r.Context(), contextkey.UserKey, tokenClaims)
 		ctx = context.WithValue(ctx, contextkey.TypeAccountKey, "user")
+		ctx = context.WithValue(ctx, contextkey.RoleKey, tokenClaims.RoleId)
 		r = r.WithContext(ctx)
 		next.ServeHTTP(w, r)
 	})
@@ -52,7 +53,7 @@ func PengelolaAuthMiddleware(next http.Handler) http.Handler {
 		authHeader := r.Header.Get("Authorization")
 		if authHeader == "" || len(authHeader) < 8 || authHeader[:7] != "Bearer " {
 			helper.WriteResponseBody(w, http.StatusUnauthorized, domain.DefaultResponse{
-				Message: "Token tidak ditemukan",
+				Message: "Unauthorized",
 			})
             return
         }
@@ -66,7 +67,7 @@ func PengelolaAuthMiddleware(next http.Handler) http.Handler {
 		
         if err != nil || !token.Valid {
             helper.WriteResponseBody(w, http.StatusUnauthorized, domain.DefaultResponse{
-				Message: "Token tidak valid",
+				Message: "Unauthorized",
 			})
             return
         }
@@ -74,8 +75,35 @@ func PengelolaAuthMiddleware(next http.Handler) http.Handler {
 		tokenClaims := token.Claims.(*domain.JWTClaims)
 		ctx := context.WithValue(r.Context(), contextkey.PengelolaKey, tokenClaims.Email)
 		ctx = context.WithValue(ctx, contextkey.TypeAccountKey, "pengelola")
+		ctx = context.WithValue(ctx, contextkey.RoleKey, tokenClaims.RoleId)
 		r = r.WithContext(ctx)
 
 		next.ServeHTTP(w, r)
 	})
+}
+
+func RoleMiddleware(allowedRoles ...string) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			roleId := r.Context().Value(contextkey.RoleKey)
+
+			if roleId == nil{
+				helper.WriteResponseBody(w, http.StatusUnauthorized, domain.DefaultResponse{
+					Message: "Unauthorized",
+				})
+				return
+			}
+
+			for _, role := range allowedRoles {
+				if roleId == role {
+					next.ServeHTTP(w, r)
+					return
+				}
+			}
+
+			helper.WriteResponseBody(w, http.StatusUnauthorized, domain.DefaultResponse{
+				Message: "Unauthorized",
+			})
+		})
+	}
 }

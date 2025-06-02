@@ -4,6 +4,7 @@ import (
 	"database/sql"
 
 	"github.com/farhansaleh/layanan_aptika_be/config"
+	"github.com/farhansaleh/layanan_aptika_be/constants"
 	"github.com/farhansaleh/layanan_aptika_be/internal/api/auth"
 	gangguanjip "github.com/farhansaleh/layanan_aptika_be/internal/api/gangguan-jip"
 	"github.com/farhansaleh/layanan_aptika_be/internal/api/instansi"
@@ -126,52 +127,80 @@ func SetupRoutes(r chi.Router, db *sql.DB, config *config.Config) {
 		r.Use(middlewares.PengelolaAuthMiddleware)
 		r.Get("/uploads/pengelola/img/{filename}", staticHandler.Image)
 		r.Get("/uploads/pengelola/docs/{filename}", staticHandler.Document)
-		
-		r.Post("/pengelola", pengelolaHandler.Create)
-		r.Put("/pengelola/{id}", pengelolaHandler.Update)
-		r.Delete("/pengelola/{id}", pengelolaHandler.Delete)
-		r.Get("/pengelola", pengelolaHandler.FindAll)
-		r.Get("/pengelola/{id}", pengelolaHandler.FindById)
 
-		r.Post("/users", usersHandler.Create)
-		r.Put("/users/{id}", usersHandler.Update)
-		r.Delete("/users/{id}", usersHandler.Delete)
-		r.Get("/users", usersHandler.FindAll)
-		r.Get("/users/{id}", usersHandler.FindById)
-		
-		r.Post("/instansi", instansiHandler.Create)
-		r.Put("/instansi/{id}", instansiHandler.Update)
-		r.Delete("/instansi/{id}", instansiHandler.Delete)
-		r.Get("/instansi/{id}", instansiHandler.FindById)
+		r.Group(func(r chi.Router) {
+			r.Use(middlewares.RoleMiddleware(constants.Admin))
 
-		r.Post("/role-pengelola", rolePengelolaHandler.Create)
-		r.Get("/role-pengelola", rolePengelolaHandler.FindAll)
-		r.Put("/role-pengelola/{id}", rolePengelolaHandler.Update)
-		r.Delete("/role-pengelola/{id}", rolePengelolaHandler.Delete)
+			r.Post("/pengelola", pengelolaHandler.Create)
+			r.Put("/pengelola/{id}", pengelolaHandler.Update)
+			r.Delete("/pengelola/{id}", pengelolaHandler.Delete)
+			r.Get("/pengelola", pengelolaHandler.FindAll)
+			r.Get("/pengelola/{id}", pengelolaHandler.FindById)
+			
+			r.Post("/users", usersHandler.Create)
+			r.Put("/users/{id}", usersHandler.Update)
+			r.Delete("/users/{id}", usersHandler.Delete)
+			r.Get("/users", usersHandler.FindAll)
+			r.Get("/users/{id}", usersHandler.FindById)
 
-		r.Get("/gangguan-jip", gangguanJIPHandler.FindAll)
-		r.Get("/gangguan-jip/{id}", gangguanJIPHandler.FindById)
-		r.Patch("/gangguan-jip/{id}", gangguanJIPHandler.UpdateStatus)
+			r.Post("/instansi", instansiHandler.Create)
+			r.Put("/instansi/{id}", instansiHandler.Update)
+			r.Delete("/instansi/{id}", instansiHandler.Delete)
+			r.Get("/instansi/{id}", instansiHandler.FindById)
 
-		r.Get("/perubahan-ip-server", perubahanIPServerHandler.FindAll)
-		r.Get("/perubahan-ip-server/{id}", perubahanIPServerHandler.FindById)
-		r.Patch("/perubahan-ip-server/{id}", perubahanIPServerHandler.UpdateStatus)
+			r.Post("/role-pengelola", rolePengelolaHandler.Create)
+			r.Get("/role-pengelola", rolePengelolaHandler.FindAll)
+			r.Put("/role-pengelola/{id}", rolePengelolaHandler.Update)
+			r.Delete("/role-pengelola/{id}", rolePengelolaHandler.Delete)
+		})
+
+		r.Group(func(r chi.Router) {
+			r.Use(middlewares.RoleMiddleware(constants.PengelolaGangguanJIP))
+
+			r.Get("/gangguan-jip", gangguanJIPHandler.FindAll)
+			r.Get("/gangguan-jip/{id}", gangguanJIPHandler.FindById)
+			r.Patch("/gangguan-jip/{id}", gangguanJIPHandler.UpdateStatus)
+		})
+
+		r.Group(func(r chi.Router) {
+			r.Use(middlewares.RoleMiddleware(constants.PengelolaIPServer))
+			
+			r.Get("/perubahan-ip-server", perubahanIPServerHandler.FindAll)
+			r.Get("/perubahan-ip-server/{id}", perubahanIPServerHandler.FindById)
+			r.Patch("/perubahan-ip-server/{id}", perubahanIPServerHandler.UpdateStatus)
+		})
+
+		r.Group(func(r chi.Router) {
+			r.Use(middlewares.RoleMiddleware(constants.PengelolaPusatDataDaerah))
+			
+			r.Get("/pusat-data-daerah", pusatDataDaerahHandler.FindAll)
+			r.Get("/pusat-data-daerah/{id}", pusatDataDaerahHandler.FindById)
+			r.Patch("/pusat-data-daerah/{id}", pusatDataDaerahHandler.UpdateStatus)
+		})
 		
-		r.Get("/pusat-data-daerah", pusatDataDaerahHandler.FindAll)
-		r.Get("/pusat-data-daerah/{id}", pusatDataDaerahHandler.FindById)
-		r.Patch("/pusat-data-daerah/{id}", pusatDataDaerahHandler.UpdateStatus)
+		r.Group(func(r chi.Router) {
+			r.Use(middlewares.RoleMiddleware(constants.PengelolaPembanugnanAplikasi))
+			
+			r.Get("/pembangunan-aplikasi", pembangunanAplikasiHandler.FindAll)
+			r.Get("/pembangunan-aplikasi/{id}", pembangunanAplikasiHandler.FindById)
+			r.Patch("/pembangunan-aplikasi/{id}", pembangunanAplikasiHandler.UpdateStatus)
+		})
+
+		r.Group(func(r chi.Router) {
+			r.Use(middlewares.RoleMiddleware(constants.PengelolaPembuatanSubdomain))
+			
+			r.Get("/pembuatan-subdomain", pembuatanSubdomainHandler.FindAll)
+			r.Get("/pembuatan-subdomain/{id}", pembuatanSubdomainHandler.FindById)
+			r.Patch("/pembuatan-subdomain/{id}", pembuatanSubdomainHandler.UpdateStatus)
+		})
 		
-		r.Get("/pembangunan-aplikasi", pembangunanAplikasiHandler.FindAll)
-		r.Get("/pembangunan-aplikasi/{id}", pembangunanAplikasiHandler.FindById)
-		r.Patch("/pembangunan-aplikasi/{id}", pembangunanAplikasiHandler.UpdateStatus)
-		
-		r.Get("/pembuatan-subdomain", pembuatanSubdomainHandler.FindAll)
-		r.Get("/pembuatan-subdomain/{id}", pembuatanSubdomainHandler.FindById)
-		r.Patch("/pembuatan-subdomain/{id}", pembuatanSubdomainHandler.UpdateStatus)
-		
-		r.Get("/pembuatan-email", pembuatanEmailHandler.FindAll)
-		r.Get("/pembuatan-email/{id}", pembuatanEmailHandler.FindById)
-		r.Patch("/pembuatan-email/{id}", pembuatanEmailHandler.UpdateStatus)
+		r.Group(func(r chi.Router) {
+			r.Use(middlewares.RoleMiddleware(constants.PengelolaPembuatanEmail))
+			
+			r.Get("/pembuatan-email", pembuatanEmailHandler.FindAll)
+			r.Get("/pembuatan-email/{id}", pembuatanEmailHandler.FindById)
+			r.Patch("/pembuatan-email/{id}", pembuatanEmailHandler.UpdateStatus)
+		})
 
 		r.Get("/permintaan", permintaanHandler.CountAll)
 		r.Get("/permintaan/gangguan-jip", permintaanHandler.CountGangguanJIP)
