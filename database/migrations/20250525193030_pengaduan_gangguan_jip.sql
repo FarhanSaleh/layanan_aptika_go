@@ -1,5 +1,5 @@
 -- +migrate Up
-CREATE TABLE `pengaduan_gangguan_jip` (
+CREATE TABLE IF NOT EXISTS `pengaduan_gangguan_jip` (
   `id` char(36) NOT NULL,
   `nama_lengkap` varchar(255) NOT NULL,
   `jabatan` varchar(255) NOT NULL,

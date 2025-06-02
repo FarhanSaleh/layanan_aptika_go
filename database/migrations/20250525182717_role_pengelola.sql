@@ -1,5 +1,5 @@
 -- +migrate Up
-CREATE TABLE `role_pengelola` (
+CREATE TABLE IF NOT EXISTS `role_pengelola` (
   `id` char(36) NOT NULL,
   `nama` varchar(255) NOT NULL,
   `is_deleted` tinyint DEFAULT NULL,

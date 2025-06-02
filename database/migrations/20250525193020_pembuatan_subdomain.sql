@@ -1,5 +1,5 @@
 -- +migrate Up
-CREATE TABLE `pembuatan_subdomain` (
+CREATE TABLE IF NOT EXISTS `pembuatan_subdomain` (
   `id` char(36) NOT NULL,
   `nama_lengkap` varchar(255) NOT NULL,
   `jabatan` varchar(255) NOT NULL,

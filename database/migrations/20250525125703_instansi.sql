@@ -1,5 +1,5 @@
 -- +migrate Up
-CREATE TABLE `instansi` (
+CREATE TABLE IF NOT EXISTS `instansi` (
   `id` char(36) NOT NULL,
   `nama` varchar(255) NOT NULL,
   `alamat` text,

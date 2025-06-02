@@ -1,5 +1,5 @@
 -- +migrate Up
-CREATE TABLE `pengelola` (
+CREATE TABLE IF NOT EXISTS `pengelola` (
   `id` char(36) NOT NULL,
   `nama` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
