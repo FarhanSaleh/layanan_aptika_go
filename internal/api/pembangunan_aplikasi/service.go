@@ -3,6 +3,7 @@ package pembangunanaplikasi
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"log"
 
 	"github.com/farhansaleh/layanan_aptika_be/config"
@@ -142,15 +143,25 @@ func (s *ServiceImpl) UpdateStatus(ctx context.Context, request domain.UpdateSta
 			return
 		}
 
-		result = domain.PembangunanAplikasi{
-			Id: id,
-			Status: request.Status,
-		}
+		result.Status = request.Status
 
 		err = s.Repository.UpdateStatus(ctx, tx, &result)
 		if err != nil {
 			log.Println("ERROR REPO <update>:", err)
 			return
+		}
+
+		if result.NotificationToken.Valid {
+			log.Println("PUSH NOTIFICATION")
+			helper.SendPushNotification(
+				result.NotificationToken.String,
+				"Layanan Permohonan Pembangunan Aplikasi", 
+				fmt.Sprintf("Permintaan anda atas nama %s, pada tanggal %s, telah %s",
+					result.NamaPimpinan, 
+					result.CreatedAt.Format(constants.TimeLayoutForNotif), 
+					request.Status,
+				),
+			)
 		}
 		return
 	})
