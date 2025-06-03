@@ -20,6 +20,7 @@ type PusatDataDaerah struct {
 	NamaInstansi 	  string
 	UserId            string
 	NamaUser          string
+	NotificationToken sql.NullString
 }
 
 type PusatDataDaerahResponse struct {

@@ -22,6 +22,7 @@ type GangguanJIP struct {
 	NamaInstansi 	  string
 	UserId            string
 	NamaUser          string
+	NotificationToken sql.NullString
 }
 
 type GangguanJIPResponse struct {

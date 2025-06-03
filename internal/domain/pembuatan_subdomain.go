@@ -22,6 +22,7 @@ type PembuatanSubdomain struct {
 	NamaInstansi 	  string
 	UserId            string
 	NamaUser          string
+	NotificationToken sql.NullString
 }
 
 type PembuatanSubdomainResponse struct {

@@ -22,6 +22,7 @@ type PembangunanAplikasi struct {
 	NamaInstansi 	  string
 	UserId            string
 	NamaUser          string
+	NotificationToken sql.NullString
 }
 
 type PembangunanAplikasiResponse struct {

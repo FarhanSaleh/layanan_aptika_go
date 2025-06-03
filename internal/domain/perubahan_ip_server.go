@@ -22,6 +22,7 @@ type PerubahanIPServer struct {
 	NamaInstansi 	  string
 	UserId            string
 	NamaUser          string
+	NotificationToken sql.NullString
 }
 
 type PerubahanIPServerResponse struct {

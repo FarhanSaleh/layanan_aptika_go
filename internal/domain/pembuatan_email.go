@@ -21,6 +21,7 @@ type PembuatanEmail struct {
 	NamaInstansi 	  string
 	UserId            string
 	NamaUser          string
+	NotificationToken sql.NullString
 }
 
 type PembuatanEmailResponse struct {
