@@ -105,10 +105,12 @@ func (r *RepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, id string) (r
 			gj.status,
 			gj.instansi_id,
 			i.nama as nama_instansi,
+			u.notification_token,
 			gj.created_at, 
 			gj.updated_at
 			FROM pengaduan_gangguan_jip as gj
 			LEFT JOIN instansi as i ON gj.instansi_id = i.id 
+			LEFT JOIN users as u ON gj.user_id = u.id 
 			WHERE gj.id = ?`
 	row := tx.QueryRowContext(ctx, SQL, id)
 	err = row.Scan(
@@ -123,6 +125,7 @@ func (r *RepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, id string) (r
 			&result.Status,
 			&result.InstansiId,
 			&result.NamaInstansi,
+			&result.NotificationToken,
 			&result.CreatedAt,
 			&result.UpdatedAt,
 		)
