@@ -53,7 +53,7 @@ func (s *ServiceImpl) Login(ctx context.Context, request domain.LoginRequest) (r
 			err = helper.NewAuthError("email atau password salah")
 			return
 		}
-		if !user.NotificationToken.Valid {
+		if user.NotificationToken.String != request.NotificationToken  {
 			err = user.NotificationToken.Scan(request.NotificationToken)
 			if err != nil {
 				log.Println("ERROR SCAN NOTIFICATION TOKEN", err)
