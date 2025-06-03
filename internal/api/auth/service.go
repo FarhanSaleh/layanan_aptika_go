@@ -123,6 +123,19 @@ func (s *ServiceImpl) PengelolaLogin(ctx context.Context, request domain.LoginRe
 }
 
 func (s *ServiceImpl) Logout(ctx context.Context) (err error) {
+	email := ctx.Value(contextkey.UserKey).(*domain.JWTClaims).Email
+
+	err = helper.WithTransaction(s.DB, func(tx *sql.Tx) (err error) {
+		result, err := s.UserRepository.FindByEmail(ctx, tx, email)
+		if err != nil {
+			log.Println("ERROR REPO <findByEmail>:", err)
+			return
+		}
+		result.NotificationToken.Scan(nil)
+		err = s.UserRepository.UpdateNotificationToken(ctx, tx, &result)
+		return
+	})
+
 	return
 }
 

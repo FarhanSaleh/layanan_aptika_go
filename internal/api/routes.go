@@ -119,7 +119,7 @@ func SetupRoutes(r chi.Router, db *sql.DB, config *config.Config) {
 		r.Get("/permintaan/perubahan-ip-server/me", permintaanHandler.CountPerubahanIPServer)
 		r.Get("/permintaan/pusat-data-daerah/me", permintaanHandler.CountPusatDataDaerah)
 
-		r.Delete("/logout", authHandler.Logout)
+		r.Delete("/logout/user", authHandler.Logout)
 	})
 	
 	// Protected routes pengelola

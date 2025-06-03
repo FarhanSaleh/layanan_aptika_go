@@ -62,12 +62,15 @@ func (h *HandlerImpl) PengelolaLogin(w http.ResponseWriter, r *http.Request){
 }
 
 func (h *HandlerImpl) Logout(w http.ResponseWriter, r *http.Request){
-	request := map[string]any{}
-	helper.ParseBody(r, &request)
+	err := h.Service.Logout(r.Context())
+	if err != nil {
+		log.Println("ERROR SERVICE:", err)
+		helper.WriteErrorResponse(w, err)
+		return
+	}
 
 	helper.WriteResponseBody(w, http.StatusOK, domain.DefaultResponse{
-		Message: "Endpoint belum digunakan",
-		Data: request,
+		Message: constants.SuccessLogout,
 	})
 }
 
