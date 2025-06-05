@@ -57,12 +57,27 @@ func (h *HandlerImpl) CountAll(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *HandlerImpl) CountGangguanJIP(w http.ResponseWriter, r *http.Request) {
-	result, err := h.Service.CountGangguanJIP(r.Context())
-	if err != nil {
-		log.Println("ERROR SERVICE:", err)
-		helper.WriteErrorResponse(w, err)
-		return
+	groupBy := r.URL.Query().Get("group_by")
+	year := r.URL.Query().Get("year")
+
+	var result any
+	var err error
+	if groupBy == "bulan" {
+		result, err = h.Service.CountLayananPerMonth(r.Context(), "pengaduan_gangguan_jip",year)
+		if err != nil {
+			log.Println("ERROR SERVICE:", err)
+			helper.WriteErrorResponse(w, err)
+			return
+		}
+	} else {
+		result, err = h.Service.CountGangguanJIP(r.Context())
+		if err != nil {
+			log.Println("ERROR SERVICE:", err)
+			helper.WriteErrorResponse(w, err)
+			return
+		}	
 	}
+
 	helper.WriteResponseBody(w, http.StatusOK, domain.DefaultResponse{
 		Message: constants.SuccessGetData,
 		Data:    result,
@@ -70,12 +85,27 @@ func (h *HandlerImpl) CountGangguanJIP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *HandlerImpl) CountPembuatanEmail(w http.ResponseWriter, r *http.Request) {
-	result, err := h.Service.CountPembuatanEmail(r.Context())
-	if err != nil {
-		log.Println("ERROR SERVICE:", err)
-		helper.WriteErrorResponse(w, err)
-		return
+	groupBy := r.URL.Query().Get("group_by")
+	year := r.URL.Query().Get("year")
+
+	var result any
+	var err error
+	if groupBy == "bulan" {
+		result, err = h.Service.CountLayananPerMonth(r.Context(), "pembuatan_email", year)
+		if err != nil {
+			log.Println("ERROR SERVICE:", err)
+			helper.WriteErrorResponse(w, err)
+			return
+		}
+	} else {
+		result, err = h.Service.CountPembuatanEmail(r.Context())
+		if err != nil {
+			log.Println("ERROR SERVICE:", err)
+			helper.WriteErrorResponse(w, err)
+			return
+		}
 	}
+
 	helper.WriteResponseBody(w, http.StatusOK, domain.DefaultResponse{
 		Message: constants.SuccessGetData,
 		Data:    result,
@@ -83,12 +113,27 @@ func (h *HandlerImpl) CountPembuatanEmail(w http.ResponseWriter, r *http.Request
 }
 
 func (h *HandlerImpl) CountPembuatanSubdomain(w http.ResponseWriter, r *http.Request) {
-	result, err := h.Service.CountPembuatanSubdomain(r.Context())
-	if err != nil {
-		log.Println("ERROR SERVICE:", err)
-		helper.WriteErrorResponse(w, err)
-		return
+	groupBy := r.URL.Query().Get("group_by")
+	year := r.URL.Query().Get("year")
+
+	var result any
+	var err error
+	if groupBy == "bulan" {
+		result, err = h.Service.CountLayananPerMonth(r.Context(), "pembuatan_subdomain", year)
+		if err != nil {
+			log.Println("ERROR SERVICE:", err)
+			helper.WriteErrorResponse(w, err)
+			return
+		}
+	} else {
+		result, err = h.Service.CountPembuatanSubdomain(r.Context())
+		if err != nil {
+			log.Println("ERROR SERVICE:", err)
+			helper.WriteErrorResponse(w, err)
+			return
+		}	
 	}
+
 	helper.WriteResponseBody(w, http.StatusOK, domain.DefaultResponse{
 		Message: constants.SuccessGetData,
 		Data:    result,
@@ -96,12 +141,27 @@ func (h *HandlerImpl) CountPembuatanSubdomain(w http.ResponseWriter, r *http.Req
 }
 
 func (h *HandlerImpl) CountPembangunanAplikasi(w http.ResponseWriter, r *http.Request) {
-	result, err := h.Service.CountPembangunanAplikasi(r.Context())
-	if err != nil {
-		log.Println("ERROR SERVICE:", err)
-		helper.WriteErrorResponse(w, err)
-		return
+	groupBy := r.URL.Query().Get("group_by")
+	year := r.URL.Query().Get("year")
+
+	var result any
+	var err error
+	if groupBy == "bulan" {
+		result, err = h.Service.CountLayananPerMonth(r.Context(), "pembangunan_aplikasi", year)
+		if err != nil {
+			log.Println("ERROR SERVICE:", err)
+			helper.WriteErrorResponse(w, err)
+			return
+		}
+	} else {
+		result, err = h.Service.CountPembangunanAplikasi(r.Context())
+		if err != nil {
+			log.Println("ERROR SERVICE:", err)
+			helper.WriteErrorResponse(w, err)
+			return
+		}	
 	}
+	
 	helper.WriteResponseBody(w, http.StatusOK, domain.DefaultResponse{
 		Message: constants.SuccessGetData,
 		Data:    result,
@@ -109,12 +169,27 @@ func (h *HandlerImpl) CountPembangunanAplikasi(w http.ResponseWriter, r *http.Re
 }
 
 func (h *HandlerImpl) CountPusatDataDaerah(w http.ResponseWriter, r *http.Request) {
-	result, err := h.Service.CountPusatDataDaerah(r.Context())
-	if err != nil {
-		log.Println("ERROR SERVICE:", err)
-		helper.WriteErrorResponse(w, err)
-		return
+	groupBy := r.URL.Query().Get("group_by")
+	year := r.URL.Query().Get("year")
+
+	var result any
+	var err error
+	if groupBy == "bulan" {
+		result, err = h.Service.CountLayananPerMonth(r.Context(), "pusat_data_daerah", year)
+		if err != nil {
+			log.Println("ERROR SERVICE:", err)
+			helper.WriteErrorResponse(w, err)
+			return
+		}
+	} else {
+		result, err = h.Service.CountPusatDataDaerah(r.Context())
+		if err != nil {
+			log.Println("ERROR SERVICE:", err)
+			helper.WriteErrorResponse(w, err)
+			return
+		}	
 	}
+
 	helper.WriteResponseBody(w, http.StatusOK, domain.DefaultResponse{
 		Message: constants.SuccessGetData,
 		Data:    result,
@@ -122,11 +197,25 @@ func (h *HandlerImpl) CountPusatDataDaerah(w http.ResponseWriter, r *http.Reques
 }
 
 func (h *HandlerImpl) CountPerubahanIPServer(w http.ResponseWriter, r *http.Request) {
-	result, err := h.Service.CountPerubahanIPServer(r.Context())
-	if err != nil {
-		log.Println("ERROR SERVICE:", err)
-		helper.WriteErrorResponse(w, err)
-		return
+	groupBy := r.URL.Query().Get("group_by")
+	year := r.URL.Query().Get("year")
+
+	var result any
+	var err error
+	if groupBy == "bulan" {
+		result, err = h.Service.CountLayananPerMonth(r.Context(), "perubahan_ip_server", year)
+		if err != nil {
+			log.Println("ERROR SERVICE:", err)
+			helper.WriteErrorResponse(w, err)
+			return
+		}
+	} else {
+		result, err = h.Service.CountPerubahanIPServer(r.Context())
+		if err != nil {
+			log.Println("ERROR SERVICE:", err)
+			helper.WriteErrorResponse(w, err)
+			return
+		}	
 	}
 	helper.WriteResponseBody(w, http.StatusOK, domain.DefaultResponse{
 		Message: constants.SuccessGetData,

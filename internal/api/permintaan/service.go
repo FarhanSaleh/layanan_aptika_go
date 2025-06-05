@@ -20,6 +20,7 @@ type Service interface {
 	CountPembangunanAplikasi(ctx context.Context) (domain.PermintaanCountResponse, error)
 	CountPusatDataDaerah(ctx context.Context) (domain.PermintaanCountResponse, error)
 	CountPerubahanIPServer(ctx context.Context) (domain.PermintaanCountResponse, error)
+	CountLayananPerMonth(ctx context.Context, tableName, year string) ([]domain.PermintaanCountResponse, error)
 }
 
 type ServiceImpl struct {
@@ -203,6 +204,24 @@ func (s *ServiceImpl) CountPerubahanIPServer(ctx context.Context) (response doma
 
 		if err != nil {
 			log.Println("ERROR REPO <countPerubahanIPServer>:")
+			return
+		}
+		return
+	})
+	return
+}
+
+func (s *ServiceImpl) CountLayananPerMonth(ctx context.Context, tableName, year string) (response []domain.PermintaanCountResponse, err error) {
+	accountType := ctx.Value(contextkey.TypeAccountKey).(string)
+	err = helper.WithTransaction(s.DB, func(tx *sql.Tx) (err error) {
+		if accountType == "user" {
+			return helper.NewAuthError("Unauthorized")
+		}
+
+		response, err = s.Repository.CountLayananPerMonth(ctx, tx, tableName, year)
+
+		if err != nil {
+			log.Println("ERROR REPO <countLayanan>:")
 			return
 		}
 		return

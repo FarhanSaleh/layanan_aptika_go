@@ -26,6 +26,7 @@ type Repository interface {
 	CountPembangunanAplikasiByUser(ctx context.Context, tx *sql.Tx, uid string) (domain.PermintaanCountResponse, error)
 	CountPusatDataDaerahByUser(ctx context.Context, tx *sql.Tx, uid string) (domain.PermintaanCountResponse, error)
 	CountPerubahanIPServerByUser(ctx context.Context, tx *sql.Tx, uid string) (domain.PermintaanCountResponse, error)
+	CountLayananPerMonth(ctx context.Context, tx *sql.Tx, tableName, year string) ([]domain.PermintaanCountResponse, error)
 }
 
 type RepositoryImpl struct{}
@@ -67,7 +68,7 @@ func (r *RepositoryImpl) CountAllPerMonth(ctx context.Context, tx *sql.Tx, year 
 		month := fmt.Sprintf("%02d", i)
 		if i == 1 {
 			bulanTahunCTE += fmt.Sprintf("SELECT '%s-%s' AS bulan", year, month)
-			}else {
+		}else {
 			bulanTahunCTE += fmt.Sprintf(" UNION ALL SELECT '%s-%s'", year, month)
 
 		}
@@ -278,5 +279,62 @@ func (r *RepositoryImpl) CountPerubahanIPServerByUser(ctx context.Context, tx *s
 			COALESCE(SUM(CASE WHEN status = 'ditolak' THEN 1 ELSE 0 END), 0) AS ditolak
 			FROM perubahan_ip_server WHERE user_id = ?;`
 	err = tx.QueryRowContext(ctx, SQL, uid).Scan(&result.Total, &result.Diproses, &result.Disetujui, &result.Ditolak)
+	return
+}
+
+func (r *RepositoryImpl) CountLayananPerMonth(ctx context.Context, tx *sql.Tx, tableName, year string) (result []domain.PermintaanCountResponse, err error) {
+	if year == "" {
+		year = time.Now().Format("2006")
+	}
+
+	var bulanTahunCTE string
+	for i := 1; i <= 12; i++ {
+		month := fmt.Sprintf("%02d", i)
+		if i == 1 {
+			bulanTahunCTE += fmt.Sprintf("SELECT '%s-%s' AS bulan", year, month)
+		}else {
+			bulanTahunCTE += fmt.Sprintf(" UNION ALL SELECT '%s-%s'", year, month)
+		}
+	}
+
+	SQL := fmt.Sprintf(`
+			WITH bulan_tahun AS (
+				%s
+			),
+			data_pengaduan AS (
+				SELECT
+				DATE_FORMAT(created_at, '%%Y-%%m') AS bulan,
+				COUNT(*) AS total,
+				COALESCE(SUM(CASE WHEN status = 'diproses' THEN 1 ELSE 0 END), 0) AS diproses,
+				COALESCE(SUM(CASE WHEN status = 'disetujui' THEN 1 ELSE 0 END), 0) AS disetujui,
+				COALESCE(SUM(CASE WHEN status = 'ditolak' THEN 1 ELSE 0 END), 0) AS ditolak
+				FROM %s GROUP BY DATE_FORMAT(created_at, '%%Y-%%m')
+			)
+			SELECT
+			bt.bulan,
+			COALESCE(dp.total, 0) AS total,
+			COALESCE(dp.diproses, 0) AS diproses,
+			COALESCE(dp.disetujui, 0) AS disetujui,
+			COALESCE(dp.ditolak, 0) AS ditolak
+			FROM bulan_tahun bt
+			LEFT JOIN data_pengaduan dp ON bt.bulan = dp.bulan
+			ORDER BY bt.bulan;`, bulanTahunCTE, tableName)
+
+	rows, err := tx.QueryContext(ctx, SQL)
+	if err != nil {
+		log.Println("ERROR QUERY: ", err)
+		return
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var u domain.PermintaanCountResponse
+		err = rows.Scan(&u.Bulan, &u.Total, &u.Diproses, &u.Disetujui, &u.Ditolak)
+		if err != nil {
+			log.Println("ERROR SCANNING: ", err)
+			return
+		}
+		result = append(result, u)
+	}
 	return
 }
